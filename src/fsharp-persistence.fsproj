@@ -4,9 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="storages/ConfigurationStorage.fs" />
     <Compile Include="storages/FileStorage.fs" />
     <Compile Include="storages/InMemoryStorage.fs" />
+    <Compile Include="storages/DatabaseStorage.fs" />
     <Compile Include="Persistence.fs" />
   </ItemGroup>
   <ItemGroup>

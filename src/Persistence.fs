@@ -1,18 +1,19 @@
 module Persistence
 
 open System.IO
+open System
+
+let private _inMemoryStorage: Map<string, string> = Map.empty
 
 type Type =
     | FileStorage of string
     | InMemoryStorage
-    | ConfigurationStorage
     | DatabaseStorage of string
 
 module Scope =
     type Type =
         | FileStorageScope of FileStream
-        | InMemoryStorageScope
-        | ConfigurationStorageScope
+        | InMemoryStorageScope of Map<string, string>
         | DatabaseStorageScope
 
     let create persistenceType =
@@ -23,13 +24,11 @@ module Scope =
                 Ok <| FileStorageScope stream
             with ex ->
                 Error ex.Message
-        | InMemoryStorage -> Error "In-memory storage is not supported"
-        | ConfigurationStorage -> Error "Configuration storage is not supported"
+        | InMemoryStorage -> Ok <| InMemoryStorageScope _inMemoryStorage
         | DatabaseStorage connectionString -> Error "Database storage is not supported"
 
     let remove scope =
         match scope with
         | FileStorageScope stream -> stream.Dispose()
-        | InMemoryStorageScope -> ignore ()
-        | ConfigurationStorageScope -> ignore ()
+        | InMemoryStorageScope _ -> ignore ()
         | DatabaseStorageScope -> ignore ()
