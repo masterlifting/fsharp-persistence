@@ -1,1 +1,1 @@
-module DatabaseStorage
+module Persistence.DatabaseStorage

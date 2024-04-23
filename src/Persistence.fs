@@ -1,9 +1,10 @@
-module Persistence
+module Persistence.Core
 
 open System.IO
+open System.Collections.Concurrent
 open System
 
-let private _inMemoryStorage: Map<string, string> = Map.empty
+let private _inMemoryStorage = ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 
 type Type =
     | FileStorage of string
@@ -13,7 +14,7 @@ type Type =
 module Scope =
     type Type =
         | FileStorageScope of FileStream
-        | InMemoryStorageScope of Map<string, string>
+        | InMemoryStorageScope of ConcurrentDictionary<string, string>
         | DatabaseStorageScope
 
     let create persistenceType =

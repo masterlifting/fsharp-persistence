@@ -1,4 +1,4 @@
-module FileStorage
+module Persistence.FileStorage
 
 open System.IO
 open System.Text
