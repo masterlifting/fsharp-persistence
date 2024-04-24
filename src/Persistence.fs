@@ -1,11 +1,5 @@
 module Persistence.Core
 
-open System.IO
-open System.Collections.Concurrent
-open System
-
-let private _inMemoryStorage = ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-
 type Type =
     | FileStorage of string
     | InMemoryStorage
@@ -13,23 +7,27 @@ type Type =
 
 module Scope =
     type Type =
-        | FileStorageScope of FileStream
-        | InMemoryStorageScope of ConcurrentDictionary<string, string>
-        | DatabaseStorageScope
+        | FileStorageScope of FileStorage.Provider
+        | InMemoryStorageScope of InMemoryStorage.Provider
+        | DatabaseStorageScope of DatabaseStorage.Provider
 
     let create persistenceType =
         match persistenceType with
         | FileStorage path ->
-            try
-                let stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite)
-                Ok <| FileStorageScope stream
-            with ex ->
-                Error ex.Message
-        | InMemoryStorage -> Ok <| InMemoryStorageScope _inMemoryStorage
-        | DatabaseStorage connectionString -> Error "Database storage is not supported"
+            match FileStorage.create path with
+            | Ok storage -> FileStorageScope storage |> Ok
+            | Error message -> Error message
+        | InMemoryStorage ->
+            match InMemoryStorage.create () with
+            | Ok storage -> InMemoryStorageScope storage |> Ok
+            | Error message -> Error message
+        | DatabaseStorage connectionString ->
+            match DatabaseStorage.create connectionString with
+            | Ok storage -> DatabaseStorageScope storage |> Ok
+            | Error message -> Error message
 
-    let remove scope =
+    let clear scope =
         match scope with
-        | FileStorageScope stream -> stream.Dispose()
-        | InMemoryStorageScope _ -> ignore ()
-        | DatabaseStorageScope -> ignore ()
+        | FileStorageScope storage -> storage.Dispose()
+        | InMemoryStorageScope storage -> storage.Clear()
+        | DatabaseStorageScope _ -> ignore ()
