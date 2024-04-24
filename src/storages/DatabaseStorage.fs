@@ -1,8 +1,10 @@
 module Persistence.DatabaseStorage
 
-open System
-
-type Provider = DbContext // DbContext is a placeholder for a real database context type
+type Provider = 
+    | SqlServer
+    | Postgres
+    | MongoDb
+    | AzureTable
 
 let create connectionString =
     try
