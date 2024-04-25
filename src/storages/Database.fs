@@ -1,14 +1,14 @@
-module Persistence.DatabaseStorage
+module Persistence.Database
 
-type DatabaseStorageType =
+type Type =
     | SqlServer
     | Postgres
     | MongoDb
     | AzureTable
 
-type Context = { f: string -> string }
+type Storage = { f: string -> string }
 
-let create connectionString =
+let internal create connectionString =
     try
         failwith "Database storage is not implemented yet."
     with ex ->

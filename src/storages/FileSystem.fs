@@ -1,20 +1,19 @@
-module Persistence.FileStorage
+module Persistence.FileSystem
 
 open System.IO
 open System.Text
 open System
 
-type Context = FileStream
+type Storage = FileStream
 
-let create path =
+let internal create path =
     try
-        let stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite)
-        Ok stream
+        use context = new Storage(path, FileMode.OpenOrCreate, FileAccess.ReadWrite)
+        Ok context
     with ex ->
         Error ex.Message
 
-
-let writeLine (stream: Context) data =
+let private writeLine data (stream: Storage) =
     async {
         try
             let buffer = Encoding.UTF8.GetBytes(data + Environment.NewLine)
@@ -26,7 +25,7 @@ let writeLine (stream: Context) data =
             return Error ex.Message
     }
 
-let readLines (stream: Context) number =
+let private readLines number (stream: Storage) =
     async {
         try
             let sr = new StreamReader(stream)
@@ -47,3 +46,6 @@ let readLines (stream: Context) number =
         with ex ->
             return Error ex.Message
     }
+
+
+let add = writeLine

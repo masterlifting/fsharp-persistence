@@ -1,33 +1,27 @@
 module Persistence.Core
 
 type Type =
-    | FileStorage of string
-    | MemoryStorage
-    | DatabaseStorage of string
+    | FileSystem of string
+    | InMemory
+    | Database of string
 
-module Scope =
+module Storage =
     type Type =
-        | FileStorageScope of FileStorage.Context
-        | MemoryStorageScope of MemoryStorage.Context
-        | DatabaseStorageScope of DatabaseStorage.Context
+        | FileStorage of FileSystem.Storage
+        | MemoryStorage of InMemory.Storage
+        | DatabaseStorage of Database.Storage
 
     let create persistenceType =
         match persistenceType with
-        | FileStorage path ->
-            match FileStorage.create path with
-            | Ok storage -> FileStorageScope storage |> Ok
+        | FileSystem path ->
+            match FileSystem.create path with
+            | Ok storage -> Ok <| FileStorage storage
             | Error message -> Error message
-        | MemoryStorage ->
-            match MemoryStorage.create () with
-            | Ok storage -> MemoryStorageScope storage |> Ok
+        | InMemory ->
+            match InMemory.create () with
+            | Ok storage -> Ok <| MemoryStorage storage
             | Error message -> Error message
-        | DatabaseStorage connectionString ->
-            match DatabaseStorage.create connectionString with
-            | Ok storage -> DatabaseStorageScope storage |> Ok
+        | Database connectionString ->
+            match Database.create connectionString with
+            | Ok storage -> Ok <| DatabaseStorage storage
             | Error message -> Error message
-
-    let clear scope =
-        match scope with
-        | FileStorageScope storage -> storage.Dispose()
-        | MemoryStorageScope storage -> storage.Clear()
-        | DatabaseStorageScope _ -> ignore ()

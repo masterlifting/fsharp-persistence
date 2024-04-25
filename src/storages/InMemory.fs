@@ -1,34 +1,39 @@
-module Persistence.MemoryStorage
+module Persistence.InMemory
 
 open System
 open System.Collections.Concurrent
 
-let storage =
-    ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+type Storage = ConcurrentDictionary<string, string>
+let storage = Storage(StringComparer.OrdinalIgnoreCase)
 
-type Context = ConcurrentDictionary<string, string>
-
-let create () =
+let internal create () =
     try
         Ok <| storage
     with ex ->
         Error ex.Message
 
-let add key value (storage: Context) =
+let add key value (storage: Storage) =
     try
         let _ = storage.TryAdd(key, value)
         Ok()
     with ex ->
         Error ex.Message
 
-let remove key (storage: Context) =
+let remove key (storage: Storage) =
     try
         let _ = storage.TryRemove(key)
         Ok()
     with ex ->
         Error ex.Message
 
-let find key (storage: Context) =
+let update key value (storage: Storage) =
+    try
+        let _ = storage.TryUpdate(key, value, storage.[key])
+        Ok()
+    with ex ->
+        Error ex.Message
+
+let find key (storage: Storage) =
     try
         match storage.TryGetValue(key) with
         | true, value -> Ok <| Some value
