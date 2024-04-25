@@ -2,14 +2,14 @@ module Persistence.Core
 
 type Type =
     | FileStorage of string
-    | InMemoryStorage
+    | MemoryStorage
     | DatabaseStorage of string
 
 module Scope =
     type Type =
-        | FileStorageScope of FileStorage.Provider
-        | InMemoryStorageScope of InMemoryStorage.Provider
-        | DatabaseStorageScope of DatabaseStorage.Provider
+        | FileStorageScope of FileStorage.Context
+        | MemoryStorageScope of MemoryStorage.Context
+        | DatabaseStorageScope of DatabaseStorage.Context
 
     let create persistenceType =
         match persistenceType with
@@ -17,9 +17,9 @@ module Scope =
             match FileStorage.create path with
             | Ok storage -> FileStorageScope storage |> Ok
             | Error message -> Error message
-        | InMemoryStorage ->
-            match InMemoryStorage.create () with
-            | Ok storage -> InMemoryStorageScope storage |> Ok
+        | MemoryStorage ->
+            match MemoryStorage.create () with
+            | Ok storage -> MemoryStorageScope storage |> Ok
             | Error message -> Error message
         | DatabaseStorage connectionString ->
             match DatabaseStorage.create connectionString with
@@ -29,5 +29,5 @@ module Scope =
     let clear scope =
         match scope with
         | FileStorageScope storage -> storage.Dispose()
-        | InMemoryStorageScope storage -> storage.Clear()
+        | MemoryStorageScope storage -> storage.Clear()
         | DatabaseStorageScope _ -> ignore ()

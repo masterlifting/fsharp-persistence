@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="storages/FileStorage.fs" />
-    <Compile Include="storages/InMemoryStorage.fs" />
+    <Compile Include="storages\MemoryStorage.fs" />
     <Compile Include="storages/DatabaseStorage.fs" />
     <Compile Include="Persistence.fs" />
   </ItemGroup>

@@ -1,10 +1,12 @@
 module Persistence.DatabaseStorage
 
-type Provider = 
+type DatabaseStorageType =
     | SqlServer
     | Postgres
     | MongoDb
     | AzureTable
+
+type Context = { f: string -> string }
 
 let create connectionString =
     try

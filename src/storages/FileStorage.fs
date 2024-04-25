@@ -4,7 +4,7 @@ open System.IO
 open System.Text
 open System
 
-type Provider = FileStream
+type Context = FileStream
 
 let create path =
     try
@@ -14,7 +14,7 @@ let create path =
         Error ex.Message
 
 
-let writeLine (stream: Provider) data =
+let writeLine (stream: Context) data =
     async {
         try
             let buffer = Encoding.UTF8.GetBytes(data + Environment.NewLine)
@@ -26,7 +26,7 @@ let writeLine (stream: Provider) data =
             return Error ex.Message
     }
 
-let readLines (stream: Provider) number =
+let readLines (stream: Context) number =
     async {
         try
             let sr = new StreamReader(stream)
