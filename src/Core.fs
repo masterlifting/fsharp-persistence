@@ -8,7 +8,7 @@ type Type =
 module Scope =
     type Type =
         | FileStorageScope of FileStorage.Provider
-        | InMemoryStorageScope of InMemoryStorage.Provider
+        | InMemoryStorageScope of InMemoryStorage.Context
         | DatabaseStorageScope of DatabaseStorage.Provider
 
     let create persistenceType =
@@ -29,5 +29,5 @@ module Scope =
     let clear scope =
         match scope with
         | FileStorageScope storage -> storage.Dispose()
-        | InMemoryStorageScope storage -> storage.Clear()
+        | InMemoryStorageScope storage -> ignore ()
         | DatabaseStorageScope _ -> ignore ()
