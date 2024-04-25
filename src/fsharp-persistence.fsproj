@@ -7,7 +7,7 @@
     <Compile Include="storages/FileStorage.fs" />
     <Compile Include="storages\MemoryStorage.fs" />
     <Compile Include="storages/DatabaseStorage.fs" />
-    <Compile Include="Persistence.fs" />
+    <Compile Include="Core.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\fsharp-infrastructure\src\fsharp-infrastructure.fsproj" />
