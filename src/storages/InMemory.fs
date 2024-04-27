@@ -33,7 +33,7 @@ let update key value (storage: Storage) =
     with ex ->
         Error ex.Message
 
-let find key (storage: Storage) =
+let get key (storage: Storage) =
     try
         match storage.TryGetValue(key) with
         | true, value -> Ok <| Some value
