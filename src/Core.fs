@@ -12,7 +12,7 @@ type Storage =
     | MemoryStorage of InMemory.Storage
     | DatabaseStorage of Database.Storage
 
-let getStorage persistenceType =
+let createStorage persistenceType =
     match persistenceType with
     | FileSystem path ->
         match FileSystem.create path with
