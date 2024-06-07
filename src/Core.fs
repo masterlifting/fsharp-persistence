@@ -15,14 +15,14 @@ type Storage =
 let createStorage persistenceType =
     match persistenceType with
     | FileSystem path ->
-        match FileSystem.create path with
-        | Ok storage -> Ok <| FileStorage storage
-        | Error message -> Error <| Persistence message
+        FileSystem.create path
+        |> Result.mapError Persistence
+        |> Result.map (fun storage -> FileStorage storage)
     | InMemory ->
-        match InMemory.create () with
-        | Ok storage -> Ok <| MemoryStorage storage
-        | Error message -> Error <| Persistence message
+        InMemory.create ()
+        |> Result.mapError Persistence
+        |> Result.map (fun storage -> MemoryStorage storage)
     | Database connectionString ->
-        match Database.create connectionString with
-        | Ok storage -> Ok <| DatabaseStorage storage
-        | Error message -> Error <| Persistence message
+        Database.create connectionString
+        |> Result.mapError Persistence
+        |> Result.map (fun storage -> DatabaseStorage storage)
