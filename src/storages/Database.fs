@@ -1,4 +1,4 @@
-module Persistence.Database
+module Persistence.Storage.Database
 
 type Type =
     | SqlServer

@@ -1,11 +1,11 @@
-module Persistence.InMemory
+module Persistence.Storage.InMemory
 
 open System
 open System.Collections.Concurrent
 open Infrastructure.Domain.Errors
 
-type Storage = ConcurrentDictionary<string, string>
-let storage = Storage(StringComparer.OrdinalIgnoreCase)
+type Context = ConcurrentDictionary<string, string>
+let storage = Context(StringComparer.OrdinalIgnoreCase)
 
 let internal create () =
     try
@@ -13,34 +13,34 @@ let internal create () =
     with ex ->
         Error ex.Message
 
-let add (storage: Storage) =
+let add (cache: Context) =
     fun key value ->
         try
-            let _ = storage.TryAdd(key, value)
+            let _ = cache.TryAdd(key, value)
             Ok()
         with ex ->
             Error <| Persistence ex.Message
 
-let remove (storage: Storage) =
+let remove (cache: Context) =
     fun key ->
         try
-            let _ = storage.TryRemove(key)
+            let _ = cache.TryRemove(key)
             Ok()
         with ex ->
             Error <| Persistence ex.Message
 
-let update (storage: Storage) =
+let update (cache: Context) =
     fun key value ->
         try
-            let _ = storage.TryUpdate(key, value, storage.[key])
+            let _ = cache.TryUpdate(key, value, cache.[key])
             Ok()
         with ex ->
             Error <| Persistence ex.Message
 
-let get (storage: Storage) =
+let get (cache: Context) =
     fun key ->
         try
-            match storage.TryGetValue(key) with
+            match cache.TryGetValue(key) with
             | true, value -> Ok <| Some value
             | _ -> Ok <| None
         with ex ->
