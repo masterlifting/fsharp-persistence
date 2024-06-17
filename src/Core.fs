@@ -4,8 +4,8 @@ open Infrastructure.Domain.Errors
 open Persistence.Storage
 open Domain
 
-let createStorage storageType =
-    match storageType with
+let createStorage ``type`` =
+    match ``type`` with
     | FileSystem path ->
         FileSystem.create path
         |> Result.map FileSystemContext
