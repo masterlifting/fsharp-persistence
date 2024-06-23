@@ -9,12 +9,12 @@ let createStorage ``type`` =
     | FileSystem path ->
         FileSystem.create path
         |> Result.map FileSystemContext
-        |> Result.mapError Persistence
+        |> Result.mapError PersistenceError
     | InMemory -> 
         InMemory.create () 
         |> Result.map InMemoryContext
-        |> Result.mapError Persistence 
+        |> Result.mapError PersistenceError 
     | Database connectionString ->
         Database.create connectionString
         |> Result.map DatabaseContext
-        |> Result.mapError Persistence
+        |> Result.mapError PersistenceError

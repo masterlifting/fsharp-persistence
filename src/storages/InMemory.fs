@@ -18,21 +18,21 @@ let add (cache: Context) key value =
         let _ = cache.TryAdd(key, value)
         Ok()
     with ex ->
-        Error <| Persistence ex.Message
+        Error <| PersistenceError ex.Message
 
 let remove (cache: Context) key =
     try
         let _ = cache.TryRemove(key)
         Ok()
     with ex ->
-        Error <| Persistence ex.Message
+        Error <| PersistenceError ex.Message
 
 let update (cache: Context) key value =
     try
         let _ = cache.TryUpdate(key, value, cache.[key])
         Ok()
     with ex ->
-        Error <| Persistence ex.Message
+        Error <| PersistenceError ex.Message
 
 let get (cache: Context) key =
     try
@@ -40,4 +40,4 @@ let get (cache: Context) key =
         | true, value -> Ok <| Some value
         | _ -> Ok <| None
     with ex ->
-        Error <| Persistence ex.Message
+        Error <| PersistenceError ex.Message
