@@ -3,6 +3,7 @@ module Persistence.Storage.FileSystem
 open System.IO
 open System.Text
 open System
+open Infrastructure.Domain.Errors
 
 type Context = FileStream
 
@@ -11,7 +12,7 @@ let internal create path =
         use context = new Context(path, FileMode.OpenOrCreate, FileAccess.ReadWrite)
         Ok context
     with ex ->
-        Error ex.Message
+        Error <| Persistence ex.Message
 
 let private writeLine data (stream: Context) =
     async {
@@ -22,7 +23,7 @@ let private writeLine data (stream: Context) =
             do! stream.FlushAsync() |> Async.AwaitTask
             return Ok()
         with ex ->
-            return Error ex.Message
+            return Error <| Persistence ex.Message
     }
 
 let private readLines number (stream: Context) =
@@ -44,7 +45,7 @@ let private readLines number (stream: Context) =
             return Ok lines
 
         with ex ->
-            return Error ex.Message
+            return Error <| Persistence ex.Message
     }
 
 

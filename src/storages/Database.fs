@@ -1,5 +1,7 @@
 module Persistence.Storage.Database
 
+open Infrastructure.Domain.Errors
+
 type Type =
     | SqlServer
     | Postgres
@@ -12,4 +14,4 @@ let internal create connectionString =
     try
         failwith "Database storage is not implemented yet."
     with ex ->
-        Error ex.Message
+        Error <| Persistence ex.Message
