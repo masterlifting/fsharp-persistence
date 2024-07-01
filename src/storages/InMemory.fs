@@ -13,28 +13,28 @@ let internal create () =
     with ex ->
         Error <| Persistence ex.Message
 
-let add (cache: Context) key value =
+let add key value (cache: Context) =
     try
         let _ = cache.TryAdd(key, value)
         Ok()
     with ex ->
         Error <| Persistence ex.Message
 
-let remove (cache: Context) key =
+let remove key (cache: Context) =
     try
         let _ = cache.TryRemove(key)
         Ok()
     with ex ->
         Error <| Persistence ex.Message
 
-let update (cache: Context) key value =
+let update key value (cache: Context) =
     try
         let _ = cache.TryUpdate(key, value, cache.[key])
         Ok()
     with ex ->
         Error <| Persistence ex.Message
 
-let get (cache: Context) key =
+let get key (cache: Context) =
     try
         match cache.TryGetValue(key) with
         | true, value -> Ok <| Some value

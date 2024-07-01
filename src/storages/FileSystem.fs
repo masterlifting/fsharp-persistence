@@ -26,21 +26,18 @@ let private writeLine data (stream: Context) =
             return Error <| Persistence ex.Message
     }
 
-let private readLines number (stream: Context) =
+let private readLines (stream: Context) =
     async {
         try
-            let sr = new StreamReader(stream)
             let mutable lines = []
-            let mutable i = 0
+            let sr = new StreamReader(stream)
 
-            while i < number do
+            while not sr.EndOfStream do
                 let! line = sr.ReadLineAsync() |> Async.AwaitTask
 
                 match String.IsNullOrWhiteSpace line with
-                | false ->
-                    lines <- line :: lines
-                    i <- i + 1
-                | true -> i <- number
+                | false -> lines <- line :: lines
+                | true -> ()
 
             return Ok lines
 
@@ -48,5 +45,6 @@ let private readLines number (stream: Context) =
             return Error <| Persistence ex.Message
     }
 
-
 let add = writeLine
+
+let get = readLines
