@@ -29,17 +29,17 @@ let private writeLine data (stream: Context) =
 let private readLines (stream: Context) =
     async {
         try
-            let mutable lines = []
+            let sb = new StringBuilder()
             let sr = new StreamReader(stream)
 
             while not sr.EndOfStream do
                 let! line = sr.ReadLineAsync() |> Async.AwaitTask
 
                 match String.IsNullOrWhiteSpace line with
-                | false -> lines <- line :: lines
+                | false -> sb.AppendLine line |> ignore
                 | true -> ()
 
-            return Ok lines
+            return Ok <| sb.ToString()
 
         with ex ->
             return Error <| Persistence ex.Message
