@@ -36,7 +36,7 @@ let private writeLine data (stream: Context) =
 let private readLines (stream: Context) =
     async {
         try
-            let sb = new StringBuilder()
+            let sb = StringBuilder()
             let sr = new StreamReader(stream)
 
             while not sr.EndOfStream do
@@ -49,7 +49,10 @@ let private readLines (stream: Context) =
             stream.Close()
             stream.Dispose()
 
-            return Ok <| sb.ToString()
+            return
+                match sb.Length with
+                | 0 -> Error <| NotFound stream.Name
+                | _ -> Ok <| sb.ToString()
         with ex ->
             stream.Close()
             stream.Dispose()
