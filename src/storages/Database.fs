@@ -14,4 +14,4 @@ let internal create connectionString =
     try
         failwith "Database storage is not implemented yet."
     with ex ->
-        Error <| Persistence ex.Message
+        Error <| NotSupported ex.Message

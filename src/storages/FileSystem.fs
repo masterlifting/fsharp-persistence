@@ -12,7 +12,7 @@ let create path =
         let context = new Context(path, FileMode.OpenOrCreate, FileAccess.ReadWrite)
         Ok context
     with ex ->
-        Error <| Persistence ex.Message
+        Error <| Operation { Message = ex.Message; Code = None }
 
 let private writeLine data (stream: Context) =
     async {
@@ -30,7 +30,7 @@ let private writeLine data (stream: Context) =
             stream.Close()
             stream.Dispose()
 
-            return Error <| Persistence ex.Message
+            return Error <| Operation { Message = ex.Message; Code = None }
     }
 
 let private readLines (stream: Context) =
@@ -57,7 +57,7 @@ let private readLines (stream: Context) =
             stream.Close()
             stream.Dispose()
 
-            return Error <| Persistence ex.Message
+            return Error <| Operation { Message = ex.Message; Code = None }
     }
 
 let add = writeLine
