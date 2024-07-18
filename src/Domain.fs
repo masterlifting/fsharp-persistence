@@ -1,6 +1,6 @@
-module Persistence.Domain
+module Persistence.Core.Domain
 
-open Persistence.Storage
+open Persistence.Domain
 
 type Type =
     | FileSystem of string
@@ -10,4 +10,4 @@ type Type =
 type Storage =
     | FileSystemContext of FileSystem.Context
     | InMemoryContext of InMemory.Context
-    | DatabaseContext of Database.Storage
+    | DatabaseContext of Database.Context

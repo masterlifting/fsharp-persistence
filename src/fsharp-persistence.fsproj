@@ -4,9 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="storages/FileSystem.fs" />
-    <Compile Include="storages/InMemory.fs" />
-    <Compile Include="storages/Database.fs" />
+    <Compile Include="storages\file_system\Domain.fs" />
+    <Compile Include="storages\file_system\Storage.fs" />
+    <Compile Include="storages\in_memory\Domain.fs" />
+    <Compile Include="storages\in_memory\Storage.fs" />
+    <Compile Include="storages\database\Domain.fs" />
+    <Compile Include="storages\database\Storage.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Core.fs" />
   </ItemGroup>
