@@ -2,4 +2,4 @@
 
 open System.Collections.Concurrent
 
-type Context = ConcurrentDictionary<string, string>
+type Storage = ConcurrentDictionary<string, string>

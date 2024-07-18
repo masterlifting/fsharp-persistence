@@ -6,4 +6,4 @@ type Type =
     | MongoDb
     | AzureTable
 
-type Context = { f: string -> string }
+type Storage = { f: string -> string }

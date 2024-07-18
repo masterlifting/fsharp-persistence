@@ -1,4 +1,4 @@
 ﻿module Persistence.Domain.FileSystem
 
-type Context = System.IO.FileStream
+type Storage = System.IO.FileStream
 

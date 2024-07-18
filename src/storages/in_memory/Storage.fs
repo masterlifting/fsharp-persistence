@@ -6,7 +6,7 @@ open Persistence.Domain.InMemory
 open Infrastructure.Domain.Errors
 
 module Context =
-    let storage = Context(StringComparer.OrdinalIgnoreCase)
+    let storage = Storage(StringComparer.OrdinalIgnoreCase)
     let internal create () =
         try
             Ok <| storage
@@ -14,7 +14,7 @@ module Context =
             Error <| Operation { Message = ex.Message; Code = None }
             
 module Query =
-    let get key (cache: Context) =
+    let get key (cache: Storage) =
         try
             match cache.TryGetValue(key) with
             | true, value -> Ok <| Some value
@@ -23,21 +23,21 @@ module Query =
             Error <| Operation { Message = ex.Message; Code = None }
             
 module Command =
-    let add key value (cache: Context) =
+    let add key value (cache: Storage) =
         try
             let _ = cache.TryAdd(key, value)
             Ok()
         with ex ->
             Error <| Operation { Message = ex.Message; Code = None }
     
-    let update key value (cache: Context) =
+    let update key value (cache: Storage) =
         try
             let _ = cache.TryUpdate(key, value, cache.[key])
             Ok()
         with ex ->
             Error <| Operation { Message = ex.Message; Code = None }
             
-    let remove key (cache: Context) =
+    let remove key (cache: Storage) =
         try
             let _ = cache.TryRemove(key)
             Ok()

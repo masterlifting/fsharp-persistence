@@ -1,13 +1,13 @@
-module Persistence.Core.Domain
+module Persistence.Domain.Core
 
-open Persistence.Domain
-
-type Type =
+type StorageType =
     | FileSystem of string
     | InMemory
     | Database of string
 
-type Storage =
-    | FileSystemContext of FileSystem.Context
-    | InMemoryContext of InMemory.Context
-    | DatabaseContext of Database.Context
+module ErrorCodes =
+    [<Literal>]
+    let NotFound = "NotFound"
+
+    [<Literal>]
+    let AlreadyExists = "AlreadyExists"

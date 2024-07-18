@@ -10,7 +10,7 @@ module Context =
     let create path =
         try
             let context =
-                new Context(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+                new Storage(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
 
             Ok context
         with ex ->
@@ -19,7 +19,7 @@ module Context =
 module Read =
     open System.Text
 
-    let rec bytes (stream: Context) =
+    let rec bytes (stream: Storage) =
         async {
             try
                 if not stream.CanRead then
@@ -40,7 +40,7 @@ module Read =
                 return Error <| Operation { Message = ex.Message; Code = None }
         }
 
-    let rec string (stream: Context) =
+    let rec string (stream: Storage) =
         async {
             try
                 if not stream.CanRead then
@@ -74,7 +74,7 @@ module Read =
 module Write =
     open System.Text
 
-    let rec bytes data (stream: Context) =
+    let rec bytes data (stream: Storage) =
         async {
             try
                 if not stream.CanWrite then
@@ -96,7 +96,7 @@ module Write =
                 return Error <| Operation { Message = ex.Message; Code = None }
         }
 
-    let rec string data (stream: Context) =
+    let rec string data (stream: Storage) =
         async {
             try
                 if not stream.CanWrite then
