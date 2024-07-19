@@ -1,11 +1,10 @@
 [<RequireQualifiedAccess>]
 module Persistence.Storage.Database
 
-open Persistence.Domain.Database
 open Infrastructure.Domain.Errors
 
 module Context =
-    let create connectionString =
+    let create _ =
         try
             failwith "Database storage is not implemented yet."
         with ex ->

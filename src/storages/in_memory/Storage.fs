@@ -32,7 +32,7 @@ module Command =
     
     let update key value (cache: Storage) =
         try
-            let _ = cache.TryUpdate(key, value, cache.[key])
+            let _ = cache.TryUpdate(key, value, cache[key])
             Ok()
         with ex ->
             Error <| Operation { Message = ex.Message; Code = None }
