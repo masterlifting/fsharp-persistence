@@ -1,7 +1,7 @@
 [<RequireQualifiedAccess>]
 module Persistence.Storage.Database
 
-open Infrastructure.Domain.Errors
+open Infrastructure
 
 module Context =
     let create _ =

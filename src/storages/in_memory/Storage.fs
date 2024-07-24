@@ -2,8 +2,8 @@
 module Persistence.Storage.InMemory
 
 open System
+open Infrastructure
 open Persistence.Domain.InMemory
-open Infrastructure.Domain.Errors
 
 module Context =
     let storage = Storage(StringComparer.OrdinalIgnoreCase)

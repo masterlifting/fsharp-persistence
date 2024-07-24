@@ -3,7 +3,7 @@ module Persistence.Storage.FileSystem
 
 open System
 open System.IO
-open Infrastructure.Domain.Errors
+open Infrastructure
 open Persistence.Domain.FileSystem
 
 module Context =

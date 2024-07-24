@@ -1,7 +1,7 @@
 module Persistence.Storage.Core
 
-open Persistence.Storage
 open Persistence.Domain
+open Persistence.Storage
 
 type StorageType =
     | FileSystemStorage of FileSystem.Storage
