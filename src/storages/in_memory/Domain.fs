@@ -1,4 +1,4 @@
-﻿module Persistence.Domain.InMemory
+﻿module Persistence.InMemory.Domain
 
 open System.Collections.Concurrent
 

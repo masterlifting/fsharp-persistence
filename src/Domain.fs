@@ -1,4 +1,4 @@
-module Persistence.Domain.Core
+module Persistence.Domain
 
 type StorageType =
     | FileSystem of string

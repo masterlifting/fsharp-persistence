@@ -1,4 +1,4 @@
-﻿module Persistence.Domain.Database
+﻿module Persistence.Database.Domain
 
 type Type =
     | SqlServer

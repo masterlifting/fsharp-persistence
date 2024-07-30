@@ -1,15 +1,15 @@
-module Persistence.Storage.Core
+[<RequireQualifiedAccess>]
+module Persistence.Storage
 
-open Persistence.Domain
-open Persistence.Storage
+open Persistence
 
 type StorageType =
-    | FileSystemStorage of FileSystem.Storage
-    | InMemoryStorage of InMemory.Storage
-    | DatabaseStorage of Database.Storage
+    | FileSystem of FileSystem.Domain.Storage
+    | InMemory of InMemory.Domain.Storage
+    | Database of Database.Domain.Storage
 
-let createStorage ``type`` =
+let create ``type`` =
     match ``type`` with
-    | Core.FileSystem path -> FileSystem.Context.create path |> Result.map FileSystemStorage
-    | Core.InMemory -> InMemory.Context.create () |> Result.map InMemoryStorage
-    | Core.Database connectionString -> Database.Context.create connectionString |> Result.map DatabaseStorage
+    | Domain.FileSystem path -> FileSystem.Storage.Context.create path |> Result.map FileSystem
+    | Domain.InMemory -> InMemory.Storage.Context.create () |> Result.map InMemory
+    | Domain.Database connectionString -> Database.Storage.Context.create connectionString |> Result.map Database

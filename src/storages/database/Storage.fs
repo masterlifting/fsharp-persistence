@@ -1,5 +1,5 @@
 [<RequireQualifiedAccess>]
-module Persistence.Storage.Database
+module Persistence.Database.Storage
 
 open Infrastructure
 

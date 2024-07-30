@@ -1,10 +1,10 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.Storage.FileSystem
+module Persistence.FileSystem.Storage
 
 open System
 open System.IO
 open Infrastructure
-open Persistence.Domain.FileSystem
+open Persistence.FileSystem.Domain
 
 module Context =
     let create path =

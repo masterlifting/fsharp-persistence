@@ -1,18 +1,19 @@
 [<RequireQualifiedAccess>]
-module Persistence.Storage.InMemory
+module Persistence.InMemory.Storage
 
 open System
 open Infrastructure
-open Persistence.Domain.InMemory
+open Persistence.InMemory.Domain
 
 module Context =
     let storage = Storage(StringComparer.OrdinalIgnoreCase)
+
     let internal create () =
         try
             Ok <| storage
         with ex ->
             Error <| Operation { Message = ex.Message; Code = None }
-            
+
 module Query =
     let get key (cache: Storage) =
         try
@@ -21,7 +22,7 @@ module Query =
             | _ -> Ok <| None
         with ex ->
             Error <| Operation { Message = ex.Message; Code = None }
-            
+
 module Command =
     let add key value (cache: Storage) =
         try
@@ -29,14 +30,14 @@ module Command =
             Ok()
         with ex ->
             Error <| Operation { Message = ex.Message; Code = None }
-    
+
     let update key value (cache: Storage) =
         try
             let _ = cache.TryUpdate(key, value, cache[key])
             Ok()
         with ex ->
             Error <| Operation { Message = ex.Message; Code = None }
-            
+
     let remove key (cache: Storage) =
         try
             let _ = cache.TryRemove(key)
