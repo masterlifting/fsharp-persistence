@@ -11,7 +11,7 @@
     <Compile Include="storages\in_memory\Storage.fs" />
     <Compile Include="storages\database\Domain.fs" />
     <Compile Include="storages\database\Storage.fs" />
-    <Compile Include="Core.fs" />
+    <Compile Include="Storage.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\fsharp-infrastructure\src\fsharp-infrastructure.fsproj" />

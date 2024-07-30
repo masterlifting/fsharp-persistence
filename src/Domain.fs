@@ -1,6 +1,6 @@
 module Persistence.Domain
 
-type StorageType =
+type Context =
     | FileSystem of string
     | InMemory
     | Database of string

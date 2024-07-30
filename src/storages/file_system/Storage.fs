@@ -6,15 +6,14 @@ open System.IO
 open Infrastructure
 open Persistence.FileSystem.Domain
 
-module Context =
-    let create path =
-        try
-            let context =
-                new Storage(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+let create path =
+    try
+        let storage =
+            new Storage(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
 
-            Ok context
-        with ex ->
-            Error <| NotSupported ex.Message
+        Ok storage
+    with ex ->
+        Error <| NotSupported ex.Message
 
 module Read =
     open System.Text

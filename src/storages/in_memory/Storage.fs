@@ -5,14 +5,13 @@ open System
 open Infrastructure
 open Persistence.InMemory.Domain
 
-module Context =
-    let storage = Storage(StringComparer.OrdinalIgnoreCase)
+let storage = Storage(StringComparer.OrdinalIgnoreCase)
 
-    let internal create () =
-        try
-            Ok <| storage
-        with ex ->
-            Error <| Operation { Message = ex.Message; Code = None }
+let internal create () =
+    try
+        Ok <| storage
+    with ex ->
+        Error <| Operation { Message = ex.Message; Code = None }
 
 module Query =
     let get key (cache: Storage) =
