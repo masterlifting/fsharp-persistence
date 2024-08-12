@@ -36,7 +36,11 @@ module Read =
                 stream.Close()
                 stream.Dispose()
 
-                return Error <| Operation { Message = ex.Message; Code = None }
+                return
+                    Error
+                    <| Operation
+                        { Message = ex.Message
+                          Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
 
     let rec string (stream: Storage) =
@@ -67,7 +71,11 @@ module Read =
                 stream.Close()
                 stream.Dispose()
 
-                return Error <| Operation { Message = ex.Message; Code = None }
+                return
+                    Error
+                    <| Operation
+                        { Message = ex.Message
+                          Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
 
 module Write =
@@ -92,7 +100,11 @@ module Write =
                 stream.Close()
                 stream.Dispose()
 
-                return Error <| Operation { Message = ex.Message; Code = None }
+                return
+                    Error
+                    <| Operation
+                        { Message = ex.Message
+                          Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
 
     let rec string data (stream: Storage) =
@@ -115,5 +127,9 @@ module Write =
                 stream.Close()
                 stream.Dispose()
 
-                return Error <| Operation { Message = ex.Message; Code = None }
+                return
+                    Error
+                    <| Operation
+                        { Message = ex.Message
+                          Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
