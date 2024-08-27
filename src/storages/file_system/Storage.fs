@@ -40,7 +40,7 @@ module Read =
                     Error
                     <| Operation
                         { Message = ex.Message
-                          Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+                          Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
 
     let rec string (stream: Storage) =
@@ -75,7 +75,7 @@ module Read =
                     Error
                     <| Operation
                         { Message = ex.Message
-                          Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+                          Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
 
 module Write =
@@ -104,7 +104,7 @@ module Write =
                     Error
                     <| Operation
                         { Message = ex.Message
-                          Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+                          Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
 
     let rec string data (stream: Storage) =
@@ -131,5 +131,5 @@ module Write =
                     Error
                     <| Operation
                         { Message = ex.Message
-                          Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+                          Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }

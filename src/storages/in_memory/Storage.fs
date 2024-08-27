@@ -14,7 +14,7 @@ let internal create () =
         Error
         <| Operation
             { Message = ex.Message
-              Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+              Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
 module Query =
     let get key (cache: Storage) =
@@ -26,7 +26,7 @@ module Query =
             Error
             <| Operation
                 { Message = ex.Message
-                  Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+                  Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
 module Command =
     let add key value (cache: Storage) =
@@ -37,7 +37,7 @@ module Command =
             Error
             <| Operation
                 { Message = ex.Message
-                  Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+                  Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
     let update key value (cache: Storage) =
         try
@@ -47,7 +47,7 @@ module Command =
             Error
             <| Operation
                 { Message = ex.Message
-                  Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+                  Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
     let remove key (cache: Storage) =
         try
@@ -57,4 +57,4 @@ module Command =
             Error
             <| Operation
                 { Message = ex.Message
-                  Code = ErrorReason.buildLine (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+                  Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
