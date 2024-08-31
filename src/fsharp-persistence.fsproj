@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="README.md" />
+    <None Include=".gitignore" />
     <Compile Include="Domain.fs" />
     <Compile Include="storages\file_system\Domain.fs" />
     <Compile Include="storages\file_system\Storage.fs" />
@@ -13,6 +15,7 @@
     <Compile Include="storages\database\Storage.fs" />
     <Compile Include="Storage.fs" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\fsharp-infrastructure\src\fsharp-infrastructure.fsproj" />
   </ItemGroup>
