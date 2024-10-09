@@ -17,9 +17,9 @@ let internal create () =
               Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
 module Query =
-    let get key (cache: Storage) =
+    let get key (storage: Storage) =
         try
-            match cache.TryGetValue(key) with
+            match storage.TryGetValue(key) with
             | true, value -> Ok <| Some value
             | _ -> Ok <| None
         with ex ->
@@ -29,9 +29,9 @@ module Query =
                   Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
 module Command =
-    let add key value (cache: Storage) =
+    let add key value (storage: Storage) =
         try
-            let _ = cache.TryAdd(key, value)
+            let _ = storage.TryAdd(key, value)
             Ok()
         with ex ->
             Error
@@ -49,9 +49,9 @@ module Command =
                 { Message = ex.Message
                   Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
-    let remove key (cache: Storage) =
+    let remove key (storage: Storage) =
         try
-            let _ = cache.TryRemove(key)
+            let _ = storage.TryRemove(key)
             Ok()
         with ex ->
             Error
