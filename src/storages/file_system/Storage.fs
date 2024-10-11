@@ -6,7 +6,9 @@ open System.IO
 open Infrastructure
 open Persistence.FileSystem.Domain
 
-let create path =
+let private storages = StorageFactory()
+
+let private create' path =
     try
         let storage =
             new Storage(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
@@ -15,8 +17,17 @@ let create path =
     with ex ->
         Error <| NotSupported ex.Message
 
+let create path =
+    match storages.TryGetValue path with
+    | true, storage -> Ok storage
+    | false, _ ->
+        match create' path with
+        | Ok storage ->
+            storages.TryAdd(path, storage) |> ignore
+            Ok storage
+        | Error ex -> Error ex
+
 module Read =
-    open System.Text
 
     let rec bytes (stream: Storage) =
         async {
@@ -25,13 +36,16 @@ module Read =
                     do! Async.Sleep 500
                     return! bytes stream
                 else
-                    let buffer = Array.zeroCreate<byte> (int stream.Length)
-                    let! _ = stream.ReadAsync(buffer, 0, buffer.Length) |> Async.AwaitTask
+                    let data = Array.zeroCreate<byte> (int stream.Length)
+                    let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
 
                     stream.Close()
                     stream.Dispose()
 
-                    return Ok buffer
+                    match data.Length with
+                    | 0 -> return Ok None
+                    | _ -> return Ok(Some data)
+
             with ex ->
                 stream.Close()
                 stream.Dispose()
@@ -50,27 +64,14 @@ module Read =
                     do! Async.Sleep 500
                     return! string stream
                 else
-                    let sb = StringBuilder()
                     let sr = new StreamReader(stream)
-
-                    while not sr.EndOfStream do
-                        let! line = sr.ReadLineAsync() |> Async.AwaitTask
-
-                        match String.IsNullOrWhiteSpace line with
-                        | false -> sb.AppendLine line |> ignore
-                        | true -> ()
-
-                    stream.Close()
-                    stream.Dispose()
+                    let! data = sr.ReadToEndAsync() |> Async.AwaitTask
 
                     return
-                        match sb.Length with
-                        | 0 -> Error <| NotFound stream.Name
-                        | _ -> Ok <| sb.ToString()
+                        match data.Length with
+                        | 0 -> Ok None
+                        | _ -> Ok(Some data)
             with ex ->
-                stream.Close()
-                stream.Dispose()
-
                 return
                     Error
                     <| Operation
@@ -92,14 +93,8 @@ module Write =
                     do! stream.WriteAsync(data, 0, data.Length) |> Async.AwaitTask
                     do! stream.FlushAsync() |> Async.AwaitTask
 
-                    stream.Close()
-                    stream.Dispose()
-
                     return Ok()
             with ex ->
-                stream.Close()
-                stream.Dispose()
-
                 return
                     Error
                     <| Operation
@@ -119,14 +114,8 @@ module Write =
                     do! stream.WriteAsync(buffer, 0, buffer.Length) |> Async.AwaitTask
                     do! stream.FlushAsync() |> Async.AwaitTask
 
-                    stream.Close()
-                    stream.Dispose()
-
                     return Ok()
             with ex ->
-                stream.Close()
-                stream.Dispose()
-
                 return
                     Error
                     <| Operation

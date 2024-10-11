@@ -7,6 +7,8 @@
     <Compile Include="Domain.fs" />
     <Compile Include="storages\file_system\Domain.fs" />
     <Compile Include="storages\file_system\Storage.fs" />
+    <Compile Include="storages\file_system\Query.fs" />
+    <Compile Include="storages\file_system\Command.fs" />
     <Compile Include="storages\in_memory\Domain.fs" />
     <Compile Include="storages\in_memory\Storage.fs" />
     <Compile Include="storages\in_memory\Query.fs" />
