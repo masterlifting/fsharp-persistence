@@ -27,5 +27,5 @@ let paginate<'a> (pagination: Query.Pagination<'a>) (data: 'a list) =
 module Json =
     let get<'a> key storage =
         storage
-        |> Storage.Query.get key
+        |> Storage.Read.string key
         |> Result.bind (Json.deserialize<'a array> |> Option.map >> Option.defaultValue (Ok [||]))

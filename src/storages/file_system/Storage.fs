@@ -1,12 +1,14 @@
 ﻿[<RequireQualifiedAccess>]
 module Persistence.FileSystem.Storage
 
-open System
+open System.Threading
+open System.Text
 open System.IO
 open Infrastructure
 open Persistence.FileSystem.Domain
 
 let private storages = StorageFactory()
+let private semaphor = new SemaphoreSlim(1, 1)
 
 let private create' path =
     try
@@ -29,27 +31,24 @@ let create path =
 
 module Read =
 
-    let rec bytes (stream: Storage) =
+    let bytes (stream: Storage) =
         async {
             try
-                if not stream.CanRead then
-                    do! Async.Sleep 500
-                    return! bytes stream
-                else
-                    let data = Array.zeroCreate<byte> (int stream.Length)
-                    let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
+                do! semaphor.WaitAsync() |> Async.AwaitTask
 
-                    stream.Close()
-                    stream.Dispose()
+                stream.Position <- 0
 
+                let data = Array.zeroCreate<byte> (int stream.Length)
+                let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
+
+                semaphor.Release() |> ignore
+
+                return
                     match data.Length with
-                    | 0 -> return Ok None
-                    | _ -> return Ok(Some data)
+                    | 0 -> Ok None
+                    | _ -> Ok(Some data)
 
             with ex ->
-                stream.Close()
-                stream.Dispose()
-
                 return
                     Error
                     <| Operation
@@ -57,20 +56,25 @@ module Read =
                           Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
 
-    let rec string (stream: Storage) =
+    let string (stream: Storage) =
         async {
             try
-                if not stream.CanRead then
-                    do! Async.Sleep 500
-                    return! string stream
-                else
-                    let sr = new StreamReader(stream)
-                    let! data = sr.ReadToEndAsync() |> Async.AwaitTask
+                do! semaphor.WaitAsync() |> Async.AwaitTask
 
-                    return
-                        match data.Length with
-                        | 0 -> Ok None
-                        | _ -> Ok(Some data)
+                stream.Position <- 0
+
+                let buffer = Array.zeroCreate<byte> (int stream.Length)
+                let! _ = stream.ReadAsync(buffer, 0, buffer.Length) |> Async.AwaitTask
+
+                semaphor.Release() |> ignore
+
+                let data = buffer |> Encoding.UTF8.GetString
+
+                return
+                    match data.Length with
+                    | 0 -> Ok None
+                    | _ -> Ok(Some data)
+
             with ex ->
                 return
                     Error
@@ -80,20 +84,21 @@ module Read =
         }
 
 module Write =
-    open System.Text
 
-    let rec bytes data (stream: Storage) =
+    let bytes (stream: Storage) data =
         async {
             try
-                if not stream.CanWrite then
-                    do! Async.Sleep 500
-                    return! bytes data stream
-                else
-                    stream.Position <- stream.Length
-                    do! stream.WriteAsync(data, 0, data.Length) |> Async.AwaitTask
-                    do! stream.FlushAsync() |> Async.AwaitTask
+                do! semaphor.WaitAsync() |> Async.AwaitTask
 
-                    return Ok()
+                stream.Position <- 0
+                stream.SetLength 0
+
+                do! stream.WriteAsync(data, 0, data.Length) |> Async.AwaitTask
+                do! stream.FlushAsync() |> Async.AwaitTask
+
+                semaphor.Release() |> ignore
+
+                return Ok()
             with ex ->
                 return
                     Error
@@ -102,19 +107,22 @@ module Write =
                           Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
         }
 
-    let rec string data (stream: Storage) =
+    let string (stream: Storage) (data: string) =
         async {
             try
-                if not stream.CanWrite then
-                    do! Async.Sleep 500
-                    return! string data stream
-                else
-                    let buffer = Encoding.UTF8.GetBytes(data + Environment.NewLine)
-                    stream.Position <- stream.Length
-                    do! stream.WriteAsync(buffer, 0, buffer.Length) |> Async.AwaitTask
-                    do! stream.FlushAsync() |> Async.AwaitTask
+                let buffer = data |> Encoding.UTF8.GetBytes
 
-                    return Ok()
+                do! semaphor.WaitAsync() |> Async.AwaitTask
+
+                stream.Position <- 0
+                stream.SetLength 0
+
+                do! stream.WriteAsync(buffer, 0, buffer.Length) |> Async.AwaitTask
+                do! stream.FlushAsync() |> Async.AwaitTask
+
+                semaphor.Release() |> ignore
+
+                return Ok()
             with ex ->
                 return
                     Error
