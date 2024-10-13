@@ -3,7 +3,7 @@ module Persistence.InMemory.Storage
 
 open System
 open Infrastructure
-open Persistence.InMemory.Domain
+open Persistence.Domain.InMemory
 
 let private storage = Storage(StringComparer.OrdinalIgnoreCase)
 

@@ -5,27 +5,33 @@ open System.Threading
 open System.Text
 open System.IO
 open Infrastructure
-open Persistence.FileSystem.Domain
+open Persistence.Domain.FileSystem
 
 let private storages = StorageFactory()
 let private semaphor = new SemaphoreSlim(1, 1)
 
-let private create' path =
+let private create' filePath =
     try
         let storage =
-            new Storage(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+            new Storage(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
 
         Ok storage
     with ex ->
         Error <| NotSupported ex.Message
 
-let create path =
-    match storages.TryGetValue path with
+let internal createFilePath (path, file) =
+    try
+        Path.Combine(path, file) |> Ok
+    with ex ->
+        Error <| NotSupported ex.Message
+
+let create filePath =
+    match storages.TryGetValue filePath with
     | true, storage -> Ok storage
     | false, _ ->
-        match create' path with
+        match create' filePath with
         | Ok storage ->
-            storages.TryAdd(path, storage) |> ignore
+            storages.TryAdd(filePath, storage) |> ignore
             Ok storage
         | Error ex -> Error ex
 
