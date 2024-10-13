@@ -12,7 +12,7 @@ module FileSystem =
 
     type Storage = IO.FileStream
     type StorageFactory = ConcurrentDictionary<string, Storage>
-    type SourcePath = { Path: string; File: string }
+    type SourcePath = { Directory: string; FileName: string }
 
 module InMemory =
     [<Literal>]

@@ -14,7 +14,7 @@ let getConnectionString persistenceType configuration =
 let create context =
     match context with
     | Storage.Context.FileSystem filePath ->
-        (filePath.Path, filePath.File)
+        (filePath.Directory, filePath.FileName)
         |> FileSystem.Storage.createFilePath
         |> Result.bind FileSystem.Storage.create
         |> Result.map Storage.Type.FileSystem
