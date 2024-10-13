@@ -14,6 +14,10 @@ module FileSystem =
     type StorageFactory = ConcurrentDictionary<string, Storage>
     type SourcePath = { Directory: string; FileName: string }
 
+    type internal Lock =
+        | Read of Storage
+        | Write of Storage
+
 module InMemory =
     [<Literal>]
     let SectionName = "InMemory"

@@ -7,38 +7,54 @@ open Infrastructure
 open Persistence.Domain.FileSystem
 
 [<Literal>]
-let private lock = ".lock"
+let private lockExt = ".lock"
 
 let private semaphore = new System.Threading.SemaphoreSlim(1, 1)
 
 let private storages = StorageFactory()
 
-let private createLock filePath =
-    let lockFile = filePath + lock
+let private createLock (lock: Lock) =
 
     let rec innerLoop attempts (delay: int) =
         async {
 
             if attempts <= 0 then
-                failwith $"FileSystem.Storage.createLock: {lockFile} could not be created."
-
-            if lockFile |> File.Exists then
-                do! Async.Sleep delay
-                return! innerLoop (attempts - 1) (delay * 2)
+                return
+                    Error
+                    <| Operation
+                        { Message = $"FileSystem.Storage.createLock: Could not be created."
+                          Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
             else
+                do! semaphore.WaitAsync() |> Async.AwaitTask
+
+                let fileName =
+                    match lock with
+                    | Read stream ->
+                        stream.Position <- 0
+                        stream.Name
+                    | Write stream ->
+                        stream.Position <- 0
+                        stream.SetLength 0
+                        stream.Name
+
+                semaphore.Release() |> ignore
+                
                 try
-                    do! semaphore.WaitAsync() |> Async.AwaitTask
-                    File.Create(lockFile).Dispose()
-                    semaphore.Release() |> ignore
+                    let lockFile = fileName + lockExt
+                    if lockFile |> File.Exists then
+                        do! Async.Sleep delay
+                        return! innerLoop (attempts - 1) (delay * 2)
+                    else
+                        return File.Create(lockFile).Dispose() |> Ok
                 with _ ->
-                    do! Async.Sleep delay
-                    return! innerLoop (attempts - 1) (delay * 2)
+                        do! Async.Sleep delay
+                        return! innerLoop (attempts - 1) (delay * 2)
         }
 
     innerLoop 10 100
 
 let private releaseLock filePath =
-    let lockFile = filePath + lock
+    let lockFile = filePath + lockExt
 
     if File.Exists(lockFile) then
         semaphore.Wait() |> ignore
@@ -73,31 +89,28 @@ let create filePath =
 module Read =
 
     let bytes (stream: Storage) =
-        async {
-            try
-                do! stream.Name |> createLock
+        createLock (Read stream)
+        |> ResultAsync.bindAsync (fun _ ->
+            async {
+                try
+                    let data = Array.zeroCreate<byte> (int stream.Length)
+                    let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
 
-                stream.Position <- 0
+                    return
+                        match data.Length with
+                        | 0 -> Ok None
+                        | _ -> Ok(Some data)
 
-                let data = Array.zeroCreate<byte> (int stream.Length)
-                let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
-
-                stream.Name |> releaseLock
-
-                return
-                    match data.Length with
-                    | 0 -> Ok None
-                    | _ -> Ok(Some data)
-
-            with ex ->
-                stream.Name |> releaseLock
-
-                return
-                    Error
-                    <| Operation
-                        { Message = ex.Message
-                          Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
-        }
+                with ex ->
+                    return
+                        Error
+                        <| Operation
+                            { Message = ex.Message
+                              Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
+            })
+        |> Async.map (fun result ->
+            stream.Name |> releaseLock
+            result)
 
     let string (stream: Storage) =
         async {
