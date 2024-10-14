@@ -5,12 +5,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Domain.fs" />
-    <Compile Include="storages\file_system\Storage.fs" />
-    <Compile Include="storages\file_system\Query.fs" />
-    <Compile Include="storages\file_system\Command.fs" />
-    <Compile Include="storages\in_memory\Storage.fs" />
-    <Compile Include="storages\in_memory\Query.fs" />
-    <Compile Include="storages\in_memory\Command.fs" />
+    <Compile Include="storages\filesystem\Storage.fs" />
+    <Compile Include="storages\filesystem\Query.fs" />
+    <Compile Include="storages\filesystem\Command.fs" />
+    <Compile Include="storages\inmemory\Storage.fs" />
+    <Compile Include="storages\inmemory\Query.fs" />
+    <Compile Include="storages\inmemory\Command.fs" />
     <Compile Include="storages\database\Storage.fs" />
     <Compile Include="Storage.fs" />
   </ItemGroup>
