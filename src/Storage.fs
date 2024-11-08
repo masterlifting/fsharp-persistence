@@ -7,9 +7,9 @@ open Persistence.Domain
 
 let getConnectionString persistenceType configuration =
     configuration
-    |> Configuration.getSection<string> $"{SectionName}:{persistenceType}"
+    |> Configuration.getSection<string> $"{SECTION_NAME}:{persistenceType}"
     |> Option.map Ok
-    |> Option.defaultValue (Error <| NotFound $"Section '%s{SectionName}' in the configuration.")
+    |> Option.defaultValue (Error <| NotFound $"Section '%s{SECTION_NAME}' in the configuration.")
 
 let create context =
     match context with

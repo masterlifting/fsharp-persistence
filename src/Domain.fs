@@ -4,11 +4,11 @@ open System
 open System.Collections.Concurrent
 
 [<Literal>]
-let internal SectionName = "Persistence"
+let internal SECTION_NAME = "Persistence"
 
 module FileSystem =
     [<Literal>]
-    let SectionName = "FileSystem"
+    let SECTION_NAME = "FileSystem"
 
     type Storage = IO.FileStream
     type StorageFactory = ConcurrentDictionary<string, Storage>
@@ -20,7 +20,7 @@ module FileSystem =
 
 module InMemory =
     [<Literal>]
-    let SectionName = "InMemory"
+    let SECTION_NAME = "InMemory"
 
     type Storage = ConcurrentDictionary<string, string>
 
