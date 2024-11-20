@@ -10,48 +10,45 @@ module FileSystem =
     [<Literal>]
     let SECTION_NAME = "FileSystem"
 
-    type Storage = IO.FileStream
-    type StorageFactory = ConcurrentDictionary<string, Storage>
-    type SourcePath = { Directory: string; FileName: string }
+    type Client = IO.FileStream
+    type ClientFactory = ConcurrentDictionary<string, Client>
+    type Source = { FIlePath: string; FileName: string }
 
     type internal Lock =
-        | Read of Storage
-        | Write of Storage
+        | Read of Client
+        | Write of Client
 
 module InMemory =
     [<Literal>]
     let SECTION_NAME = "InMemory"
 
-    type Storage = ConcurrentDictionary<string, string>
+    type Client = ConcurrentDictionary<string, string>
 
 module Database =
-    type Type =
+    type DatabaseType =
         | SqlServer
         | Postgres
         | MongoDb
         | AzureTable
 
-    type Storage = { f: string -> string }
+    type Client = { f: string -> string }
 
-[<RequireQualifiedAccess>]
-module Storage =
+type Connection =
+    | FileSystem of FileSystem.Source
+    | InMemory
+    | Database of string
 
-    type Context =
-        | FileSystem of FileSystem.SourcePath
-        | InMemory
-        | Database of string
-
-    type Type =
-        | FileSystem of FileSystem.Storage
-        | InMemory of InMemory.Storage
-        | Database of Database.Storage
+type Storage =
+    | FileSystem of FileSystem.Client
+    | InMemory of InMemory.Client
+    | Database of Database.Client
 
 module ErrorCodes =
     [<Literal>]
-    let NotFound = "NotFound"
+    let NOT_FOUND = "NotFound"
 
     [<Literal>]
-    let AlreadyExists = "AlreadyExists"
+    let ALREADY_EXISTS = "AlreadyExists"
 
 module Query =
 

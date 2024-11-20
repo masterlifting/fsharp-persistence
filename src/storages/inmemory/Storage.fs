@@ -5,7 +5,7 @@ open System
 open Infrastructure
 open Persistence.Domain.InMemory
 
-let private storage = Storage(StringComparer.OrdinalIgnoreCase)
+let private storage = Client(StringComparer.OrdinalIgnoreCase)
 
 let internal create () =
     try
@@ -17,7 +17,7 @@ let internal create () =
               Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
 module Read =
-    let string key (storage: Storage) =
+    let string key (storage: Client) =
         try
             match storage.TryGetValue(key) with
             | true, value -> Ok <| Some value
@@ -29,7 +29,7 @@ module Read =
                   Code = ErrorReason.buildLineOpt (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) }
 
 module Write =
-    let string key value (storage: Storage) =
+    let string key value (storage: Client) =
         try
             storage.AddOrUpdate(key, value, (fun _ _ -> value)) |> ignore |> Ok
         with ex ->

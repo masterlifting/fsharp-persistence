@@ -11,9 +11,9 @@ let private lockExt = ".lock"
 
 let private semaphore = new System.Threading.SemaphoreSlim(1, 1)
 
-let private storages = StorageFactory()
+let private storages = ClientFactory()
 
-let private createLock (stream: Storage) =
+let private createLock (stream: Client) =
 
     let lockFile = stream.Name + lockExt
 
@@ -40,7 +40,7 @@ let private createLock (stream: Storage) =
 
     innerLoop 10 100
 
-let private releaseLock (stream: Storage) =
+let private releaseLock (stream: Client) =
     let lockFile = stream.Name + lockExt
 
     let rec innerLoop attempts (delay: int) =
@@ -65,34 +65,34 @@ let private releaseLock (stream: Storage) =
 
     innerLoop 10 100
 
-let internal createFilePath (path, file) =
+let internal createSource (filePath, fileName) =
     try
-        Path.Combine(path, file) |> Ok
+        Path.Combine(filePath, fileName) |> Ok
     with ex ->
         Error <| NotSupported(ex |> Exception.toMessage)
 
-let create filePath =
+let create file =
     let initialize () =
         try
-            let storage =
-                new Storage(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+            let client =
+                new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
 
-            Ok storage
+            Ok client
         with ex ->
             Error <| NotSupported(ex |> Exception.toMessage)
 
-    match storages.TryGetValue filePath with
+    match storages.TryGetValue file with
     | true, storage -> Ok storage
     | false, _ ->
         match initialize () with
         | Ok storage ->
-            storages.TryAdd(filePath, storage) |> ignore
+            storages.TryAdd(file, storage) |> ignore
             Ok storage
         | Error ex -> Error ex
 
 module Read =
 
-    let private read (stream: Storage) =
+    let private read (stream: Client) =
         async {
             do! semaphore.WaitAsync() |> Async.AwaitTask
 
@@ -105,7 +105,7 @@ module Read =
             return data
         }
 
-    let bytes (stream: Storage) =
+    let bytes (stream: Client) =
         stream
         |> createLock
         |> ResultAsync.bindAsync (fun _ ->
@@ -126,7 +126,7 @@ module Read =
             })
         |> Async.bind (fun result -> stream |> releaseLock |> ResultAsync.bind (fun _ -> result))
 
-    let string (stream: Storage) =
+    let string (stream: Client) =
         stream
         |> createLock
         |> ResultAsync.bindAsync (fun _ ->
@@ -149,7 +149,7 @@ module Read =
 
 module Write =
 
-    let private write (data: byte array) (stream: Storage) =
+    let private write (data: byte array) (stream: Client) =
         async {
             do! semaphore.WaitAsync() |> Async.AwaitTask
 
@@ -162,7 +162,7 @@ module Write =
             semaphore.Release() |> ignore
         }
 
-    let bytes (stream: Storage) data =
+    let bytes (stream: Client) data =
         stream
         |> createLock
         |> ResultAsync.bindAsync (fun _ ->
@@ -179,7 +179,7 @@ module Write =
             })
         |> Async.bind (fun result -> stream |> releaseLock |> ResultAsync.bind (fun _ -> result))
 
-    let string (stream: Storage) (data: string) =
+    let string (stream: Client) (data: string) =
         stream
         |> createLock
         |> ResultAsync.bindAsync (fun _ ->
