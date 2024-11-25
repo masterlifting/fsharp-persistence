@@ -19,8 +19,7 @@ let create connection =
         |> Result.bind FileSystem.Storage.create
         |> Result.map Storage.FileSystem
     | Connection.InMemory -> InMemory.Storage.create () |> Result.map Storage.InMemory
-    | Connection.Database connectionString ->
-        Database.Storage.create connectionString |> Result.map Storage.Database
+    | Connection.Database connectionString -> Database.Storage.create connectionString |> Result.map Storage.Database
 
 module Command =
     let execute storage execute =
