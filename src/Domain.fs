@@ -43,7 +43,7 @@ type Storage =
     | InMemory of InMemory.Client
     | Database of Database.Client
 
-module ErrorCodes =
+module ErrorCode =
     [<Literal>]
     let NOT_FOUND = "NotFound"
 
