@@ -7,14 +7,14 @@ open Persistence.Domain
 
 let getConnectionString persistenceType configuration =
     configuration
-    |> Configuration.getSection<string> $"{SECTION_NAME}:{persistenceType}"
+    |> Configuration.getSection<string> $"{SECTION_NAME}:%s{persistenceType}"
     |> Option.map Ok
     |> Option.defaultValue (Error <| NotFound $"Section '%s{SECTION_NAME}' in the configuration.")
 
 let create connection =
     match connection with
     | Connection.FileSystem src ->
-        (src.FIlePath, src.FileName)
+        (src.FilePath, src.FileName)
         |> FileSystem.Storage.createSource
         |> Result.bind FileSystem.Storage.create
         |> Result.map Storage.FileSystem
