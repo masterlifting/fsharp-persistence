@@ -7,9 +7,6 @@ open System.Collections.Concurrent
 let internal SECTION_NAME = "Persistence"
 
 module FileSystem =
-    [<Literal>]
-    let SECTION_NAME = "FileSystem"
-
     type Client = IO.FileStream
     type ClientFactory = ConcurrentDictionary<string, Client>
     type Source = { FilePath: string; FileName: string }
@@ -19,9 +16,6 @@ module FileSystem =
         | Write of Client
 
 module InMemory =
-    [<Literal>]
-    let SECTION_NAME = "InMemory"
-
     type Client = ConcurrentDictionary<string, string>
 
 module Database =

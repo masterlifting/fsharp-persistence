@@ -5,9 +5,18 @@ open Infrastructure
 open Persistence
 open Persistence.Domain
 
-let getConnectionString persistenceType configuration =
+/// <summary>
+/// Gets the connection value from the configuration.
+/// </summary>
+/// <param name="sectionName">
+/// The name of the section in the 'Persistence' section.
+/// </param>
+/// <param name="configuration">
+/// IConfigurationRoot instance.
+/// </param>
+let getConnectionString sectionName configuration =
     configuration
-    |> Configuration.getSection<string> $"{SECTION_NAME}:%s{persistenceType}"
+    |> Configuration.getSection<string> $"{SECTION_NAME}:%s{sectionName}"
     |> Option.map Ok
     |> Option.defaultValue (Error <| NotFound $"Section '%s{SECTION_NAME}' in the configuration.")
 
