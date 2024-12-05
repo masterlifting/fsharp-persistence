@@ -2,6 +2,7 @@ module Persistence.Domain
 
 open System
 open System.Collections.Concurrent
+open Microsoft.Extensions.Configuration
 
 [<Literal>]
 let internal SECTION_NAME = "Persistence"
@@ -26,16 +27,18 @@ module Database =
         | AzureTable
 
     type Client = { f: string -> string }
-
+    
 type Connection =
     | FileSystem of FileSystem.Source
     | InMemory
     | Database of string
+    | Configuration of IConfigurationRoot
 
 type Storage =
     | FileSystem of FileSystem.Client
     | InMemory of InMemory.Client
     | Database of Database.Client
+    | Configuration of IConfigurationRoot
 
 module ErrorCode =
     [<Literal>]

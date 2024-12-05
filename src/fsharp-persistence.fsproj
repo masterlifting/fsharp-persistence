@@ -12,7 +12,10 @@
     <Compile Include="storages\inmemory\Query.fs" />
     <Compile Include="storages\inmemory\Command.fs" />
     <Compile Include="storages\database\Storage.fs" />
+    <Compile Include="storages\configuration\Query.fs" />
+    <Compile Include="storages\configuration\Storage.fs" />
     <Compile Include="Storage.fs" />
+    <Compile Include="DataAccess.Error.fs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
