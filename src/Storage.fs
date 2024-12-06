@@ -29,7 +29,8 @@ let create connection =
         |> Result.map Storage.FileSystem
     | Connection.InMemory -> InMemory.Storage.create () |> Result.map Storage.InMemory
     | Connection.Database connectionString -> Database.Storage.create connectionString |> Result.map Storage.Database
-    | Connection.Configuration config -> Configuration.Storage.create config |> Storage.Configuration |> Ok
+    | Connection.Configuration(section, config) ->
+        Configuration.Storage.create section config |> Storage.Configuration |> Ok
 
 module Command =
     let execute storage execute =

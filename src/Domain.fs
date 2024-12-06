@@ -27,18 +27,18 @@ module Database =
         | AzureTable
 
     type Client = { f: string -> string }
-    
+
 type Connection =
     | FileSystem of FileSystem.Source
     | InMemory
     | Database of string
-    | Configuration of IConfigurationRoot
+    | Configuration of sectionName: string * configuration: IConfigurationRoot
 
 type Storage =
     | FileSystem of FileSystem.Client
     | InMemory of InMemory.Client
     | Database of Database.Client
-    | Configuration of IConfigurationRoot
+    | Configuration of sectionName: string * configuration: IConfigurationRoot
 
 module ErrorCode =
     [<Literal>]
