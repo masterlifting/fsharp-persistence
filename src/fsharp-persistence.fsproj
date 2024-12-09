@@ -4,18 +4,27 @@
     <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Domain.fs" />
-    <Compile Include="storages\filesystem\Storage.fs" />
-    <Compile Include="storages\filesystem\Query.fs" />
-    <Compile Include="storages\filesystem\Command.fs" />
-    <Compile Include="storages\inmemory\Storage.fs" />
-    <Compile Include="storages\inmemory\Query.fs" />
-    <Compile Include="storages\inmemory\Command.fs" />
-    <Compile Include="storages\database\Storage.fs" />
-    <Compile Include="storages\configuration\Query.fs" />
-    <Compile Include="storages\configuration\Storage.fs" />
+    <Compile Include="domain\Domain.FileSystem.fs" />
+    <Compile Include="domain\Domain.InMemory.fs" />
+    <Compile Include="domain\Domain.Database.fs" />
+    <Compile Include="domain\Domain.Connection.fs" />
+    <Compile Include="domain\Domain.Storage.fs" />
+    <Compile Include="domain\Domain.Query.fs" />
+    <Compile Include="storages\filesystem\FileSystem.Storage.fs" />
+    <Compile Include="storages\filesystem\FileSystem.Reader.fs" />
+    <Compile Include="storages\filesystem\FileSystem.Writer.fs" />
+    <Compile Include="storages\filesystem\FileSystem.Query.fs" />
+    <Compile Include="storages\filesystem\FileSystem.Command.fs" />
+    <Compile Include="storages\inmemory\InMemory.Storage.fs" />
+    <Compile Include="storages\inmemory\InMemory.Reader.fs" />
+    <Compile Include="storages\inmemory\InMemory.Writer.fs" />
+    <Compile Include="storages\inmemory\InMemory.Query.fs" />
+    <Compile Include="storages\inmemory\InMemory.Command.fs" />
+    <Compile Include="storages\database\Database.Storage.fs" />
+    <Compile Include="storages\configuration\Configuration.Storage.fs" />
+    <Compile Include="storages\configuration\Configuration.Query.fs" />
+    <Compile Include="data_access\DataAccess.Error.fs" />
     <Compile Include="Storage.fs" />
-    <Compile Include="DataAccess.Error.fs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

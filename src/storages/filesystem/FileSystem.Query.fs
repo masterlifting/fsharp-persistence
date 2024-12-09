@@ -2,6 +2,7 @@
 module Persistence.FileSystem.Query
 
 open Infrastructure
+open Infrastructure.Prelude
 open Persistence.Domain
 
 let paginate<'a> (pagination: Query.Pagination<'a>) (data: 'a list) =
@@ -27,5 +28,5 @@ let paginate<'a> (pagination: Query.Pagination<'a>) (data: 'a list) =
 module Json =
     let get<'a> client =
         client
-        |> Storage.Read.string
+        |> Read.string
         |> ResultAsync.bind (Json.deserialize<'a array> |> Option.map >> Option.defaultValue (Ok [||]))

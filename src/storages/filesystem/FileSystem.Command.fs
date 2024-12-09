@@ -1,8 +1,9 @@
 ﻿[<RequireQualifiedAccess>]
 module Persistence.FileSystem.Command
 
-open Infrastructure
+open Infrastructure.Prelude
+open Infrastructure.SerDe
 
 module Json =
     let save<'a> (data: 'a array) client =
-        data |> Json.serialize |> ResultAsync.wrap (Storage.Write.string client)
+        data |> Json.serialize |> ResultAsync.wrap (Write.string client)

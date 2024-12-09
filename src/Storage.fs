@@ -2,7 +2,7 @@
 module Persistence.Storage
 
 open Infrastructure
-open Persistence
+open Infrastructure.Domain
 open Persistence.Domain
 
 /// <summary>
@@ -16,9 +16,9 @@ open Persistence.Domain
 /// </param>
 let getConnectionString sectionName configuration =
     configuration
-    |> Configuration.getSection<string> $"{SECTION_NAME}:%s{sectionName}"
+    |> Configuration.getSection<string> $"Persistence:%s{sectionName}"
     |> Option.map Ok
-    |> Option.defaultValue (Error <| NotFound $"Section '%s{SECTION_NAME}' in the configuration.")
+    |> Option.defaultValue (Error <| NotFound $"Section 'Persistence' in the configuration.")
 
 let create connection =
     match connection with

@@ -2,6 +2,7 @@
 module Persistence.Configuration.Query
 
 open Infrastructure
+open Infrastructure.Domain
 open Microsoft.Extensions.Configuration
 
 let get<'a> key (client: IConfigurationRoot) =

@@ -1,7 +1,7 @@
 [<RequireQualifiedAccess>]
 module Persistence.Database.Storage
 
-open Infrastructure
+open Infrastructure.Domain
 
 let create _ =
     try
