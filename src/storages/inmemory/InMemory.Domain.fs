@@ -1,4 +1,5 @@
-﻿module Persistence.Domain.InMemory
+﻿[<AutoOpen>]
+module Persistence.InMemory.Domain
 
 open System.Collections.Concurrent
 

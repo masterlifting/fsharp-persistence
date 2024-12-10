@@ -4,7 +4,6 @@ module Persistence.FileSystem.Write
 open System.Text
 open Infrastructure.Domain
 open Infrastructure.Prelude
-open Persistence.Domain.FileSystem
 
 let private write (data: byte array) (stream: Client) =
     async {

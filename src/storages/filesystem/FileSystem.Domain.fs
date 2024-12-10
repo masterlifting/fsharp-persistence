@@ -1,4 +1,5 @@
-﻿module Persistence.Domain.FileSystem
+﻿[<AutoOpen>]
+module Persistence.FileSystem.Domain
 
 open System
 open System.Collections.Concurrent

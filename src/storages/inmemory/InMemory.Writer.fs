@@ -2,7 +2,6 @@
 module Persistence.InMemory.Write
 
 open Infrastructure.Domain
-open Persistence.Domain.InMemory
 
 let string key value (storage: Client) =
     try

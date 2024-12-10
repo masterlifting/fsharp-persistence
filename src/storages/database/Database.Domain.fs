@@ -1,4 +1,5 @@
-﻿module Persistence.Domain.Database
+﻿[<AutoOpen>]
+module Persistence.Database.Domain
 
 type DatabaseType =
     | SqlServer

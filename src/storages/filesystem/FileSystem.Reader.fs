@@ -4,7 +4,6 @@ module Persistence.FileSystem.Read
 open System.Text
 open Infrastructure.Domain
 open Infrastructure.Prelude
-open Persistence.Domain.FileSystem
 
 let private read (stream: Client) =
     async {

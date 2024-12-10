@@ -3,7 +3,19 @@ module Persistence.Storage
 
 open Infrastructure
 open Infrastructure.Domain
-open Persistence.Domain
+open Microsoft.Extensions.Configuration
+
+type Storage =
+    | FileSystem of FileSystem.Domain.Client
+    | InMemory of InMemory.Domain.Client
+    | Database of Database.Domain.Client
+    | Configuration of sectionName: string * configuration: IConfigurationRoot
+
+type Connection =
+    | FileSystem of FileSystem.Domain.Source
+    | InMemory
+    | Database of string
+    | Configuration of sectionName: string * configuration: IConfigurationRoot
 
 /// <summary>
 /// Gets the connection value from the configuration.
@@ -20,20 +32,14 @@ let getConnectionString sectionName configuration =
     |> Option.map Ok
     |> Option.defaultValue (Error <| NotFound $"Section 'Persistence' in the configuration.")
 
-let create connection =
+let init connection =
     match connection with
     | Connection.FileSystem src ->
         (src.FilePath, src.FileName)
         |> FileSystem.Storage.createSource
-        |> Result.bind FileSystem.Storage.create
+        |> Result.bind FileSystem.Storage.init
         |> Result.map Storage.FileSystem
-    | Connection.InMemory -> InMemory.Storage.create () |> Result.map Storage.InMemory
-    | Connection.Database connectionString -> Database.Storage.create connectionString |> Result.map Storage.Database
+    | Connection.InMemory -> InMemory.Storage.init () |> Result.map Storage.InMemory
+    | Connection.Database connectionString -> Database.Storage.init connectionString |> Result.map Storage.Database
     | Connection.Configuration(section, config) ->
-        Configuration.Storage.create section config |> Storage.Configuration |> Ok
-
-module Command =
-    let execute storage execute =
-        match storage with
-        | Storage.InMemory context -> context |> execute
-        | _ -> async { return Error <| NotSupported $"Storage {storage}" }
+        Configuration.Storage.init section config |> Storage.Configuration |> Ok

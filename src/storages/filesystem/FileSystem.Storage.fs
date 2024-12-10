@@ -4,7 +4,6 @@ module Persistence.FileSystem.Storage
 open System.IO
 open Infrastructure.Domain
 open Infrastructure.Prelude
-open Persistence.Domain.FileSystem
 
 let private storages = ClientFactory()
 
@@ -14,7 +13,7 @@ let internal createSource (filePath, fileName) =
     with ex ->
         Error <| NotSupported(ex |> Exception.toMessage)
 
-let create file =
+let init file =
     let initialize () =
         try
             let client =

@@ -30,48 +30,54 @@ module private Reason =
     [<Literal>]
     let Cancelled = nameof Canceled
 
-type ErrorCode with
-    member this.ToEntity() =
+type private ErrorCode with
+    member this.ToValue() =
         match this with
-        | Line(x, y, z) -> [ x; y; z ] |> String.concat Code.DELIMITER
+        | Line(x, y, z) -> [ (nameof Line); x; y; z ] |> String.concat Code.DELIMITER
 
 type ErrorEntity() =
     member val Type = System.String.Empty with get, set
     member val Value = System.String.Empty with get, set
-    member val CodeType: string option = None with get, set
     member val Code: string option = None with get, set
 
+    member private this.ToErrorCode() =
+        match this.Code with
+        | Some code ->
+            let args = code.Split Code.DELIMITER
+
+            match args.Length with
+            | 4 ->
+                match args[0] with
+                | Code.Line -> ErrorCode.Line(args[1], args[2], args[3]) |> Some |> Ok
+                | _ -> code |> NotSupported |> Result.Error
+            | _ -> code |> NotSupported |> Result.Error
+        | None -> None |> Ok
+
     member this.ToDomain() =
-        match this.Type with
-        | Reason.Operation ->
-            Error'.Operation
-            <| { Message = this.Value
-                 Code = code.T
-            |> Ok
-        | Reason.Permission ->
-            Error'.Permission
-                { Message = this.Value
-                  Code = this.Code }
-            |> Ok
-        | Reason.NotFound -> Error'.NotFound this.Value |> Ok
-        | Reason.NotSupported -> Error'.NotSupported this.Value |> Ok
-        | Reason.NotImplemented -> Error'.NotImplemented this.Value |> Ok
-        | Reason.Cancelled -> Canceled this.Value |> Ok
-        | _ -> this.Type |> Error'.NotSupported |> Result.Error
+        this.ToErrorCode()
+        |> Result.bind (fun code ->
+            match this.Type with
+            | Reason.Operation -> Error'.Operation { Message = this.Value; Code = code } |> Ok
+            | Reason.Permission -> Error'.Permission { Message = this.Value; Code = code } |> Ok
+            | Reason.NotFound -> Error'.NotFound this.Value |> Ok
+            | Reason.NotSupported -> Error'.NotSupported this.Value |> Ok
+            | Reason.NotImplemented -> Error'.NotImplemented this.Value |> Ok
+            | Reason.Cancelled -> Error'.Canceled this.Value |> Ok
+            | _ -> this.Type |> Error'.NotSupported |> Result.Error)
 
 type Error' with
-    member this.toEntity() =
+    member this.ToEntity() =
         let result = ErrorEntity()
 
         match this with
         | Error'.Operation reason ->
             result.Type <- Reason.Operation
             result.Value <- reason.Message
-            result.Code <- reason.Code |> Option.map _.Value
+            result.Code <- reason.Code |> Option.map _.ToValue()
         | Error'.Permission reason ->
             result.Type <- Reason.Permission
             result.Value <- reason.Message
-            result.Code <- reason.Code |> Option.map _.Value
+            result.Code <- reason.Code |> Option.map _.ToValue()
         | Error'.NotFound src ->
             result.Type <- Reason.NotFound
             result.Value <- src

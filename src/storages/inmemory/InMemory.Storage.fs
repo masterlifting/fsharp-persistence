@@ -3,11 +3,10 @@ module Persistence.InMemory.Storage
 
 open System
 open Infrastructure.Domain
-open Persistence.Domain.InMemory
 
 let internal Storage = Client(StringComparer.OrdinalIgnoreCase)
 
-let create () =
+let init () =
     try
         Ok <| Storage
     with ex ->
