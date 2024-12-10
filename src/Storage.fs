@@ -5,7 +5,7 @@ open Infrastructure
 open Infrastructure.Domain
 open Microsoft.Extensions.Configuration
 
-type Storage =
+type Type =
     | FileSystem of FileSystem.Domain.Client
     | InMemory of InMemory.Domain.Client
     | Database of Database.Domain.Client
@@ -38,8 +38,7 @@ let init connection =
         (src.FilePath, src.FileName)
         |> FileSystem.Storage.createSource
         |> Result.bind FileSystem.Storage.init
-        |> Result.map Storage.FileSystem
-    | Connection.InMemory -> InMemory.Storage.init () |> Result.map Storage.InMemory
-    | Connection.Database connectionString -> Database.Storage.init connectionString |> Result.map Storage.Database
-    | Connection.Configuration(section, config) ->
-        Configuration.Storage.init section config |> Storage.Configuration |> Ok
+        |> Result.map Type.FileSystem
+    | Connection.InMemory -> InMemory.Storage.init () |> Result.map Type.InMemory
+    | Connection.Database connectionString -> Database.Storage.init connectionString |> Result.map Type.Database
+    | Connection.Configuration(section, config) -> Configuration.Storage.init section config |> Type.Configuration |> Ok
