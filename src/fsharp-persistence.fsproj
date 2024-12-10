@@ -19,7 +19,7 @@
     <Compile Include="storages\inmemory\InMemory.Command.fs" />
     <Compile Include="storages\database\Database.Domain.fs" />
     <Compile Include="storages\database\Database.Storage.fs" />
-    <Compile Include="storages\configuration\Configuration.Storage.fs" />
+    <Compile Include="storages\configuration\Configuration.Domain.fs" />
     <Compile Include="storages\configuration\Configuration.Query.fs" />
     <Compile Include="data_access\DataAccess.Error.fs" />
     <Compile Include="Storage.fs" />
