@@ -7,30 +7,32 @@ open Infrastructure.Prelude
 
 let private storages = ClientFactory()
 
-let internal createSource (filePath, fileName) =
+let private createFile src =
     try
-        Path.Combine(filePath, fileName) |> Ok
+        Path.Combine(src.FilePath, src.FileName) |> Ok
     with ex ->
         Error <| NotSupported(ex |> Exception.toMessage)
 
-let init file =
-    let initialize () =
-        try
-            let client =
-                new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+let private createClient file =
+    try
+        let client =
+            new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
 
-            Ok client
-        with ex ->
-            ex |> Exception.toMessage |> NotSupported |> Error
+        Ok client
+    with ex ->
+        ex |> Exception.toMessage |> NotSupported |> Error
 
-    match storages.TryGetValue file with
-    | true, storage -> Ok storage
-    | false, _ ->
-        match initialize () with
-        | Ok storage ->
-            storages.TryAdd(file, storage) |> ignore
-            Ok storage
-        | Error ex -> Error ex
+let init src =
+    createFile src
+    |> Result.bind (fun file ->
+        match storages.TryGetValue file with
+        | true, storage -> Ok storage
+        | false, _ ->
+            match createClient file with
+            | Ok storage ->
+                storages.TryAdd(file, storage) |> ignore
+                Ok storage
+            | Error ex -> Error ex)
 
 [<Literal>]
 let private lockExt = ".lock"

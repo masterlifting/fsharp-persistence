@@ -3,9 +3,8 @@ module Persistence.Storage
 
 open Infrastructure
 open Infrastructure.Domain
-open Microsoft.Extensions.Configuration
 
-type Client =
+type Type =
     | FileSystem of FileSystem.Domain.Client
     | InMemory of InMemory.Domain.Client
     | Database of Database.Domain.Client
@@ -34,11 +33,7 @@ let getConnectionString sectionName configuration =
 
 let init connection =
     match connection with
-    | Connection.FileSystem src ->
-        (src.FilePath, src.FileName)
-        |> FileSystem.Storage.createSource
-        |> Result.bind FileSystem.Storage.init
-        |> Result.map Client.FileSystem
-    | Connection.InMemory -> InMemory.Storage.init () |> Result.map Client.InMemory
-    | Connection.Database connectionString -> Database.Storage.init connectionString |> Result.map Client.Database
-    | Connection.Configuration connection -> connection |> Client.Configuration |> Ok
+    | Connection.InMemory -> InMemory.Storage.init () |> Result.map Type.InMemory
+    | Connection.FileSystem src -> src |> FileSystem.Storage.init |> Result.map Type.FileSystem
+    | Connection.Database connectionString -> connectionString |> Database.Storage.init |> Result.map Type.Database
+    | Connection.Configuration connection -> connection |> Type.Configuration |> Ok
