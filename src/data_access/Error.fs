@@ -57,18 +57,24 @@ type ErrorEntity() =
             let args = code.Split Code.DELIMITER
 
             match args.Length with
-            | 4 ->
+            | 2 ->
                 match args[0] with
-                | Code.LINE -> ErrorCode.Line(args[1], args[2], args[3]) |> Some |> Ok
+                | Code.CUSTOM -> args[1] |> ErrorCode.Custom |> Some |> Ok
+                | _ -> $"Error' code: {code}" |> NotSupported |> Result.Error
+            | 3 ->
+                match args[0] with
                 | Code.HTTP ->
                     args[1]
                     |> System.Enum.Parse<System.Net.HttpStatusCode>
                     |> ErrorCode.Http
                     |> Some
                     |> Ok
-                | Code.CUSTOM -> args[1] |> ErrorCode.Custom |> Some |> Ok
-                | _ -> code |> NotSupported |> Result.Error
-            | _ -> code |> NotSupported |> Result.Error
+                | _ -> $"Error' code: {code}" |> NotSupported |> Result.Error
+            | 4 ->
+                match args[0] with
+                | Code.LINE -> ErrorCode.Line(args[1], args[2], args[3]) |> Some |> Ok
+                | _ -> $"Error' code: {code}" |> NotSupported |> Result.Error
+            | _ -> $"Error' code: {code}" |> NotSupported |> Result.Error
         | None -> None |> Ok
 
     member this.ToDomain() =
@@ -82,7 +88,7 @@ type ErrorEntity() =
             | Reason.NOT_SUPPORTED -> Error'.NotSupported this.Value |> Ok
             | Reason.NOT_IMPLEMENTED -> Error'.NotImplemented this.Value |> Ok
             | Reason.CANCELED -> Error'.Canceled this.Value |> Ok
-            | _ -> this.Type |> Error'.NotSupported |> Result.Error)
+            | _ -> $"Error' type: {this.Type}" |> Error'.NotSupported |> Result.Error)
 
 type Error' with
     member this.ToEntity() =
