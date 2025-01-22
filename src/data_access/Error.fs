@@ -1,6 +1,7 @@
 ﻿[<AutoOpen>]
 module Persistence.DataAccess.Error
 
+open System
 open Infrastructure.Domain
 
 module private Code =
@@ -42,13 +43,14 @@ module private Reason =
 type private ErrorCode with
     member this.ToValue() =
         match this with
-        | Line(x, y, z) -> [ (nameof Line); x; y; z ] |> String.concat Code.DELIMITER
-        | Http code -> [ nameof Http; code |> System.Enum.GetName ] |> String.concat Code.DELIMITER
-        | Custom value -> [ nameof Custom; value ] |> String.concat Code.DELIMITER
+        | Line(path, file, line) -> [ Code.LINE; path; file; line ]
+        | Http statusCode -> [ Code.HTTP; statusCode |> Enum.GetName ]
+        | Custom value -> [ Code.CUSTOM; value ]
+        |> String.concat Code.DELIMITER
 
 type ErrorEntity() =
-    member val Type = System.String.Empty with get, set
-    member val Value = System.String.Empty with get, set
+    member val Type = String.Empty with get, set
+    member val Value = String.Empty with get, set
     member val Code: string option = None with get, set
 
     member private this.ToErrorCode() =
@@ -59,63 +61,58 @@ type ErrorEntity() =
             match args.Length with
             | 2 ->
                 match args[0] with
-                | Code.CUSTOM -> args[1] |> ErrorCode.Custom |> Some |> Ok
-                | _ -> $"Error' code: {code}" |> NotSupported |> Result.Error
-            | 3 ->
-                match args[0] with
+                | Code.CUSTOM -> args[1] |> Custom |> Some |> Ok
                 | Code.HTTP ->
-                    args[1]
-                    |> System.Enum.Parse<System.Net.HttpStatusCode>
-                    |> ErrorCode.Http
-                    |> Some
-                    |> Ok
-                | _ -> $"Error' code: {code}" |> NotSupported |> Result.Error
+                    match Enum.TryParse<Net.HttpStatusCode>(args[1]) with
+                    | true, statusCode -> statusCode |> Http |> Some |> Ok
+                    | false, _ -> $"Invalid HTTP status code: {args[1]}" |> NotSupported |> Error
+                | _ -> $"Unsupported error code: {code}" |> NotSupported |> Error
             | 4 ->
                 match args[0] with
-                | Code.LINE -> ErrorCode.Line(args[1], args[2], args[3]) |> Some |> Ok
-                | _ -> $"Error' code: {code}" |> NotSupported |> Result.Error
-            | _ -> $"Error' code: {code}" |> NotSupported |> Result.Error
+                | Code.LINE -> Line(args[1], args[2], args[3]) |> Some |> Ok
+                | _ -> $"Unsupported line error code: {code}" |> NotSupported |> Error
+            | _ -> $"Invalid error code format: {code}" |> NotSupported |> Error
         | None -> None |> Ok
 
     member this.ToDomain() =
         this.ToErrorCode()
         |> Result.bind (fun code ->
             match this.Type with
-            | Reason.OPERATION -> Error'.Operation { Message = this.Value; Code = code } |> Ok
-            | Reason.PERMISSION -> Error'.Permission { Message = this.Value; Code = code } |> Ok
-            | Reason.ALREADY_EXISTS -> Error'.AlreadyExists this.Value |> Ok
-            | Reason.NOT_FOUND -> Error'.NotFound this.Value |> Ok
-            | Reason.NOT_SUPPORTED -> Error'.NotSupported this.Value |> Ok
-            | Reason.NOT_IMPLEMENTED -> Error'.NotImplemented this.Value |> Ok
-            | Reason.CANCELED -> Error'.Canceled this.Value |> Ok
-            | _ -> $"Error' type: {this.Type}" |> Error'.NotSupported |> Result.Error)
+            | Reason.OPERATION -> Operation { Message = this.Value; Code = code } |> Ok
+            | Reason.PERMISSION -> Permission { Message = this.Value; Code = code } |> Ok
+            | Reason.ALREADY_EXISTS -> AlreadyExists this.Value |> Ok
+            | Reason.NOT_FOUND -> NotFound this.Value |> Ok
+            | Reason.NOT_SUPPORTED -> NotSupported this.Value |> Ok
+            | Reason.NOT_IMPLEMENTED -> NotImplemented this.Value |> Ok
+            | Reason.CANCELED -> Canceled this.Value |> Ok
+            | _ -> $"Error' type: {this.Type}" |> NotSupported |> Error)
 
 type Error' with
     member this.ToEntity() =
         let result = ErrorEntity()
 
         match this with
-        | Error'.Operation reason ->
+        | Operation reason ->
             result.Type <- Reason.OPERATION
             result.Value <- reason.Message
             result.Code <- reason.Code |> Option.map _.ToValue()
-        | Error'.Permission reason ->
+        | Permission reason ->
             result.Type <- Reason.PERMISSION
             result.Value <- reason.Message
             result.Code <- reason.Code |> Option.map _.ToValue()
-        | Error'.AlreadyExists src ->
+        | AlreadyExists src ->
             result.Type <- Reason.ALREADY_EXISTS
             result.Value <- src
-        | Error'.NotFound src ->
+        | NotFound src ->
             result.Type <- Reason.NOT_FOUND
             result.Value <- src
-        | Error'.NotSupported src ->
+        | NotSupported src ->
             result.Type <- Reason.NOT_SUPPORTED
             result.Value <- src
-        | Error'.NotImplemented src ->
+        | NotImplemented src ->
             result.Type <- Reason.NOT_IMPLEMENTED
             result.Value <- src
-        | Error'.Canceled src ->
+        | Canceled src ->
             result.Type <- Reason.CANCELED
             result.Value <- src
 
