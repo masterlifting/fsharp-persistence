@@ -44,7 +44,13 @@ type private ErrorCode with
     member this.ToValue() =
         match this with
         | Line(path, file, line) -> [ Code.LINE; path; file; line ]
-        | Http statusCode -> [ Code.HTTP; statusCode |> Enum.GetName ]
+        | Http statusCode ->
+            match statusCode |> Enum.IsDefined with
+            | true ->
+                match statusCode |> Enum.GetName with
+                | null -> [ Code.HTTP; $"%A{statusCode}" ]
+                | statusName -> [ Code.HTTP; statusName ]
+            | false -> [ Code.HTTP; $"%A{statusCode}" ]
         | Custom value -> [ Code.CUSTOM; value ]
         |> String.concat Code.DELIMITER
 
