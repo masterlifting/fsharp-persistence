@@ -2,7 +2,6 @@
 module Persistence.Storage
 
 open Infrastructure
-open Infrastructure.Domain
 
 type Type =
     | FileSystem of FileSystem.Domain.Client
@@ -15,21 +14,6 @@ type Connection =
     | InMemory
     | Database of Database.Domain.Connection
     | Configuration of Configuration.Domain.Connection
-
-/// <summary>
-/// Gets the connection value from the configuration.
-/// </summary>
-/// <param name="sectionName">
-/// The name of the section in the 'Persistence' section.
-/// </param>
-/// <param name="configuration">
-/// IConfigurationRoot instance.
-/// </param>
-let getConnectionString sectionName configuration =
-    configuration
-    |> Configuration.getSection<string> $"Persistence:%s{sectionName}"
-    |> Option.map Ok
-    |> Option.defaultValue (Error <| NotFound $"Section 'Persistence' in the configuration.")
 
 let init connection =
     match connection with
