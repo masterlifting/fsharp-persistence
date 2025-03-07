@@ -21,7 +21,8 @@
     <Compile Include="storages\database\Domain.fs" />
     <Compile Include="storages\database\Storage.fs" />
     <Compile Include="storages\configuration\Domain.fs" />
-    <Compile Include="storages\configuration\Query.fs" />
+    <Compile Include="storages\configuration\Storage.fs" />
+    <Compile Include="storages\configuration\Reader.fs" />
     <Compile Include="data_access\Error.fs" />
     <Compile Include="Storage.fs" />
   </ItemGroup>

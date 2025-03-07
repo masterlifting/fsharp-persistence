@@ -11,10 +11,10 @@ type Type =
     | Configuration of Configuration.Domain.Client
 
 type Connection =
-    | FileSystem of FileSystem.Domain.Source
+    | FileSystem of FileSystem.Domain.Connection
     | InMemory
-    | Database of string
-    | Configuration of Configuration.Domain.Client
+    | Database of Database.Domain.Connection
+    | Configuration of Configuration.Domain.Connection
 
 /// <summary>
 /// Gets the connection value from the configuration.
@@ -34,6 +34,6 @@ let getConnectionString sectionName configuration =
 let init connection =
     match connection with
     | Connection.InMemory -> InMemory.Storage.init () |> Result.map Type.InMemory
-    | Connection.FileSystem src -> src |> FileSystem.Storage.init |> Result.map Type.FileSystem
-    | Connection.Database connectionString -> connectionString |> Database.Storage.init |> Result.map Type.Database
-    | Connection.Configuration connection -> connection |> Type.Configuration |> Ok
+    | Connection.FileSystem value -> value |> FileSystem.Storage.init |> Result.map Type.FileSystem
+    | Connection.Database value -> value |> Database.Storage.init |> Result.map Type.Database
+    | Connection.Configuration value -> value |> Configuration.Storage.init |> Result.map Type.Configuration

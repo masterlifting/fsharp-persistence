@@ -8,3 +8,7 @@ type DatabaseType =
     | AzureTable
 
 type Client = { f: string -> string }
+
+type Connection =
+    { ConnectionString: string
+      Type: DatabaseType }

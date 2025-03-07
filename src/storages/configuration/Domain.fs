@@ -4,5 +4,9 @@ module Persistence.Configuration.Domain
 open Microsoft.Extensions.Configuration
 
 type Client =
-    { SectionName: string
-      Configuration: IConfigurationRoot }
+    { Configuration: IConfigurationRoot
+      Key: string }
+
+type Connection =
+    { Configuration: IConfigurationRoot
+      SectionName: string }
