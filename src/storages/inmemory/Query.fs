@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.InMemory.Query
+module Persistence.Storages.InMemory.Query
 
 open Infrastructure
 open Persistence.Domain

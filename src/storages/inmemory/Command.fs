@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.InMemory.Command
+module Persistence.Storages.InMemory.Command
 
 open Infrastructure
 

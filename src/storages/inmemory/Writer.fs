@@ -1,7 +1,8 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.InMemory.Write
+module Persistence.Storages.InMemory.Write
 
 open Infrastructure.Domain
+open Persistence.Storages.Domain.InMemory
 
 let string key value (storage: Client) =
     try

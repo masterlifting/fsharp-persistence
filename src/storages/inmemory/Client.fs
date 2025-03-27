@@ -1,8 +1,9 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.InMemory.Storage
+module Persistence.Storages.InMemory.Client
 
 open System
 open Infrastructure.Domain
+open Persistence.Storages.Domain.InMemory
 
 let internal Storage = Client(StringComparer.OrdinalIgnoreCase)
 

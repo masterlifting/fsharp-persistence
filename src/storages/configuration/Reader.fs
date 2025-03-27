@@ -1,8 +1,9 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.Configuration.Read
+module Persistence.Storages.Configuration.Read
 
 open Infrastructure
 open Infrastructure.Domain
+open Persistence.Storages.Domain.Configuration
 
 let section<'a> (client: Client) =
     client.Configuration

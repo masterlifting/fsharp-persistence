@@ -1,5 +1,4 @@
-﻿[<AutoOpen>]
-module Persistence.Configuration.Domain
+﻿module Persistence.Storages.Domain.Configuration
 
 open Microsoft.Extensions.Configuration
 
@@ -8,5 +7,5 @@ type Client =
       Key: string }
 
 type Connection =
-    { Configuration: IConfigurationRoot
+    { Provider: IConfigurationRoot
       SectionName: string }
