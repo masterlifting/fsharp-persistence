@@ -9,4 +9,4 @@ let section<'a> (client: Client) =
     client.Configuration
     |> Configuration.getSection<'a> client.Key
     |> Option.map Ok
-    |> Option.defaultValue ($"Section '%s{client.Key}' in the configuration." |> NotFound |> Error)
+    |> Option.defaultValue ($"The section '%s{client.Key}' in a configuration" |> NotFound |> Error)

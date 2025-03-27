@@ -71,13 +71,25 @@ type ErrorEntity() =
                 | Code.HTTP ->
                     match Enum.TryParse<Net.HttpStatusCode>(args[1]) with
                     | true, statusCode -> statusCode |> Http |> Some |> Ok
-                    | false, _ -> $"Invalid HTTP status code: {args[1]}" |> NotSupported |> Error
-                | _ -> $"Unsupported error code: {code}" |> NotSupported |> Error
+                    | false, _ -> $"Invalid HTTP status code '{args[1]}'" |> NotSupported |> Error
+                | _ ->
+                    Error
+                    <| Operation
+                        { Message = $"Invalid error code '{code}' in the error entity."
+                          Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
             | 4 ->
                 match args[0] with
                 | Code.LINE -> Line(args[1], args[2], args[3]) |> Some |> Ok
-                | _ -> $"Unsupported line error code: {code}" |> NotSupported |> Error
-            | _ -> $"Invalid error code format: {code}" |> NotSupported |> Error
+                | _ ->
+                    Error
+                    <| Operation
+                        { Message = $"Invalid error code '{code}' in the error entity."
+                          Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+            | _ ->
+                Error
+                <| Operation
+                    { Message = $"Invalid error code '{code}' in the error entity."
+                      Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
         | None -> None |> Ok
 
     member this.ToDomain() =
@@ -91,7 +103,7 @@ type ErrorEntity() =
             | Reason.NOT_SUPPORTED -> NotSupported this.Value |> Ok
             | Reason.NOT_IMPLEMENTED -> NotImplemented this.Value |> Ok
             | Reason.CANCELED -> Canceled this.Value |> Ok
-            | _ -> $"Error' type: {this.Type}" |> NotSupported |> Error)
+            | _ -> $"Error type '{this.Type}'" |> NotSupported |> Error)
 
 type Error' with
     member this.ToEntity() =
