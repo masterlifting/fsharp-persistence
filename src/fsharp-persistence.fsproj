@@ -7,7 +7,7 @@
   <ItemGroup>
     <Compile Include="domain\Query.fs" />
     <Compile Include="storages\filesystem\Domain.fs" />
-    <Compile Include="storages\filesystem\Storage.fs" />
+    <Compile Include="storages\filesystem\Client.fs" />
     <Compile Include="storages\filesystem\Reader.fs" />
     <Compile Include="storages\filesystem\Writer.fs" />
     <Compile Include="storages\filesystem\Query.fs" />

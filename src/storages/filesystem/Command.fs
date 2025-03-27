@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.FileSystem.Command
+module Persistence.Storages.FileSystem.Command
 
 open Infrastructure.Prelude
 open Infrastructure.SerDe

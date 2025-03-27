@@ -1,26 +1,28 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.FileSystem.Read
+module Persistence.Storages.FileSystem.Read
 
 open System.Text
 open Infrastructure.Domain
 open Infrastructure.Prelude
+open Persistence.Storages.FileSystem
+open Persistence.Storages.Domain.FileSystem
 
 let private read (stream: Client) =
     async {
-        do! Storage.Semaphore.WaitAsync() |> Async.AwaitTask
+        do! Client.Semaphore.WaitAsync() |> Async.AwaitTask
 
         stream.Position <- 0
         let data = Array.zeroCreate<byte> (int stream.Length)
         let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
 
-        Storage.Semaphore.Release() |> ignore
+        Client.Semaphore.Release() |> ignore
 
         return data
     }
 
 let bytes (stream: Client) =
     stream
-    |> Storage.createLock
+    |> Client.createLock
     |> ResultAsync.bindAsync (fun _ ->
         async {
             try
@@ -37,11 +39,11 @@ let bytes (stream: Client) =
                         { Message = ex |> Exception.toMessage
                           Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
         })
-    |> Async.bind (fun result -> stream |> Storage.releaseLock |> ResultAsync.bind (fun _ -> result))
+    |> Async.bind (fun result -> stream |> Client.releaseLock |> ResultAsync.bind (fun _ -> result))
 
 let string (stream: Client) =
     stream
-    |> Storage.createLock
+    |> Client.createLock
     |> ResultAsync.bindAsync (fun _ ->
         async {
             try
@@ -58,4 +60,4 @@ let string (stream: Client) =
                         { Message = ex |> Exception.toMessage
                           Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
         })
-    |> Async.bind (fun result -> stream |> Storage.releaseLock |> ResultAsync.bind (fun _ -> result))
+    |> Async.bind (fun result -> stream |> Client.releaseLock |> ResultAsync.bind (fun _ -> result))

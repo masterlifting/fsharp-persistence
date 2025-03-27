@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.FileSystem.Query
+module Persistence.Storages.FileSystem.Query
 
 open Infrastructure
 open Infrastructure.Prelude

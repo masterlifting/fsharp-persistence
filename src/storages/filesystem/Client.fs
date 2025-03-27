@@ -1,9 +1,10 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.FileSystem.Storage
+module Persistence.Storages.FileSystem.Client
 
 open System.IO
 open Infrastructure.Domain
 open Infrastructure.Prelude
+open Persistence.Storages.Domain.FileSystem
 
 let private storages = ClientFactory()
 
