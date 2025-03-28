@@ -2,10 +2,12 @@
 
 open Microsoft.Extensions.Configuration
 
-type Client =
-    { Configuration: IConfigurationRoot
-      Key: string }
+type Client = {
+    Configuration: IConfigurationRoot
+    Key: string
+}
 
-type Connection =
-    { Provider: IConfigurationRoot
-      SectionName: string }
+type Connection = {
+    Provider: IConfigurationRoot
+    SectionName: string
+}

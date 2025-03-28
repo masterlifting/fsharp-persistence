@@ -8,6 +8,7 @@ type DatabaseType =
 
 type Client = { f: string -> string }
 
-type Connection =
-    { ConnectionString: string
-      Type: DatabaseType }
+type Connection = {
+    ConnectionString: string
+    Type: DatabaseType
+}

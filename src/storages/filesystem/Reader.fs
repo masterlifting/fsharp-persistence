@@ -35,9 +35,10 @@ let bytes (stream: Client) =
             with ex ->
                 return
                     Error
-                    <| Operation
-                        { Message = ex |> Exception.toMessage
-                          Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+                    <| Operation {
+                        Message = ex |> Exception.toMessage
+                        Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                    }
         })
     |> Async.bind (fun result -> stream |> Client.releaseLock |> ResultAsync.bind (fun _ -> result))
 
@@ -56,8 +57,9 @@ let string (stream: Client) =
             with ex ->
                 return
                     Error
-                    <| Operation
-                        { Message = ex |> Exception.toMessage
-                          Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+                    <| Operation {
+                        Message = ex |> Exception.toMessage
+                        Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                    }
         })
     |> Async.bind (fun result -> stream |> Client.releaseLock |> ResultAsync.bind (fun _ -> result))

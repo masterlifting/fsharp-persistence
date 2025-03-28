@@ -9,6 +9,7 @@ let string key value (storage: Client) =
         storage.AddOrUpdate(key, value, (fun _ _ -> value)) |> ignore |> Ok
     with ex ->
         Error
-        <| Operation
-            { Message = ex.Message
-              Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+        <| Operation {
+            Message = ex.Message
+            Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+        }

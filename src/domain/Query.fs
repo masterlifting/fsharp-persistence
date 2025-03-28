@@ -16,7 +16,8 @@ type SortBy<'a> =
 
 type Predicate<'a> = 'a -> bool
 
-type Pagination<'a> =
-    { Page: int
-      PageSize: int
-      SortBy: SortBy<'a> }
+type Pagination<'a> = {
+    Page: int
+    PageSize: int
+    SortBy: SortBy<'a>
+}

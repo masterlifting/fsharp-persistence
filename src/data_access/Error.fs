@@ -74,22 +74,25 @@ type ErrorEntity() =
                     | false, _ -> $"Invalid HTTP status code '{args[1]}'" |> NotSupported |> Error
                 | _ ->
                     Error
-                    <| Operation
-                        { Message = $"Invalid error code '{code}' in the error entity."
-                          Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+                    <| Operation {
+                        Message = $"Invalid error code '{code}' in the error entity."
+                        Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                    }
             | 4 ->
                 match args[0] with
                 | Code.LINE -> Line(args[1], args[2], args[3]) |> Some |> Ok
                 | _ ->
                     Error
-                    <| Operation
-                        { Message = $"Invalid error code '{code}' in the error entity."
-                          Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+                    <| Operation {
+                        Message = $"Invalid error code '{code}' in the error entity."
+                        Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                    }
             | _ ->
                 Error
-                <| Operation
-                    { Message = $"Invalid error code '{code}' in the error entity."
-                      Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+                <| Operation {
+                    Message = $"Invalid error code '{code}' in the error entity."
+                    Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                }
         | None -> None |> Ok
 
     member this.ToDomain() =

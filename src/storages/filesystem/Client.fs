@@ -50,9 +50,10 @@ let internal createLock (stream: Client) =
             if attempts <= 0 then
                 return
                     Error
-                    <| Operation
-                        { Message = $"Failed to acquire lock after {attempts} attempts."
-                          Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+                    <| Operation {
+                        Message = $"Failed to acquire lock after {attempts} attempts."
+                        Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                    }
             else
                 try
                     if lockFile |> File.Exists then
@@ -76,9 +77,10 @@ let internal releaseLock (stream: Client) =
             if attempts <= 0 then
                 return
                     Error
-                    <| Operation
-                        { Message = $"Failed to release lock after {attempts} attempts."
-                          Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some }
+                    <| Operation {
+                        Message = $"Failed to release lock after {attempts} attempts."
+                        Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                    }
             else
                 try
                     if lockFile |> File.Exists then
