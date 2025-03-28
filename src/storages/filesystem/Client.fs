@@ -84,6 +84,7 @@ let internal releaseLock (stream: Client) =
             else
                 try
                     if lockFile |> File.Exists then
+                        stream.Flush()
                         return File.Delete(lockFile) |> Ok
                     else
                         return Ok()
