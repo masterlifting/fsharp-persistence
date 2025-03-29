@@ -14,7 +14,7 @@ let private createFile src =
     with ex ->
         Error
         <| Operation {
-            Message = $"Failed to create file path {src.FilePath}. " + (ex |>  Exception.toMessage)
+            Message = $"Failed to create file path {src.FilePath}. " + (ex |> Exception.toMessage)
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
 
@@ -27,7 +27,7 @@ let private createClient file =
     with ex ->
         Error
         <| Operation {
-            Message = $"Failed to create client for file {file}. " + (ex |>  Exception.toMessage)
+            Message = $"Failed to create client for file {file}. " + (ex |> Exception.toMessage)
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
 
