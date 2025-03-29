@@ -71,7 +71,7 @@ type ErrorEntity() =
                 | Code.HTTP ->
                     match Enum.TryParse<Net.HttpStatusCode>(args[1]) with
                     | true, statusCode -> statusCode |> Http |> Some |> Ok
-                    | false, _ -> $"Invalid HTTP status code '{args[1]}'" |> NotSupported |> Error
+                    | false, _ -> $"HTTP status code '{args[1]}' is not supported." |> NotSupported |> Error
                 | _ ->
                     Error
                     <| Operation {
@@ -106,7 +106,7 @@ type ErrorEntity() =
             | Reason.NOT_SUPPORTED -> NotSupported this.Value |> Ok
             | Reason.NOT_IMPLEMENTED -> NotImplemented this.Value |> Ok
             | Reason.CANCELED -> Canceled this.Value |> Ok
-            | _ -> $"Error type '{this.Type}'" |> NotSupported |> Error)
+            | _ -> $"Error type '{this.Type}' is not supported." |> NotSupported |> Error)
 
 type Error' with
     member this.ToEntity() =

@@ -12,7 +12,11 @@ let private createFile src =
     try
         Path.Combine(src.FilePath, src.FileName) |> Ok
     with ex ->
-        Error <| NotSupported(ex |> Exception.toMessage)
+        Error
+        <| Operation {
+            Message = $"Failed to create file path {src.FilePath}. " + (ex |>  Exception.toMessage)
+            Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+        }
 
 let private createClient file =
     try
@@ -21,7 +25,11 @@ let private createClient file =
 
         Ok client
     with ex ->
-        ex |> Exception.toMessage |> NotSupported |> Error
+        Error
+        <| Operation {
+            Message = $"Failed to create client for file {file}. " + (ex |>  Exception.toMessage)
+            Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+        }
 
 let init src =
     createFile src
