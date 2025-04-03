@@ -14,7 +14,9 @@ let private createFile connection =
     with ex ->
         Error
         <| Operation {
-            Message = $"Failed to create file path {connection.FilePath}. " + (ex |> Exception.toMessage)
+            Message =
+                $"Failed to create file path {connection.FilePath}. "
+                + (ex |> Exception.toMessage)
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
 

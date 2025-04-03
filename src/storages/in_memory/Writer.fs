@@ -6,7 +6,9 @@ open Persistence.Storages.Domain.InMemory
 
 let string value (client: Client) =
     try
-        client.Storage.AddOrUpdate(client.TableName, value, (fun _ _ -> value)) |> ignore |> Ok
+        client.Storage.AddOrUpdate(client.TableName, value, (fun _ _ -> value))
+        |> ignore
+        |> Ok
     with ex ->
         Error
         <| Operation {
