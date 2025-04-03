@@ -3,11 +3,11 @@
 open Microsoft.Extensions.Configuration
 
 type Client = {
-    Configuration: IConfigurationRoot
-    Key: string
+    ReadOnlyStorage: IConfigurationRoot
+    Section: string
 }
 
 type Connection = {
     Provider: IConfigurationRoot
-    SectionName: string
+    Section: string
 }

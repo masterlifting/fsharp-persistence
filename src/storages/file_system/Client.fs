@@ -8,13 +8,13 @@ open Persistence.Storages.Domain.FileSystem
 
 let private storages = ClientFactory()
 
-let private createFile src =
+let private createFile connection =
     try
-        Path.Combine(src.FilePath, src.FileName) |> Ok
+        Path.Combine(connection.FilePath, connection.FileName) |> Ok
     with ex ->
         Error
         <| Operation {
-            Message = $"Failed to create file path {src.FilePath}. " + (ex |> Exception.toMessage)
+            Message = $"Failed to create file path {connection.FilePath}. " + (ex |> Exception.toMessage)
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
 
@@ -31,8 +31,8 @@ let private createClient file =
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
 
-let init src =
-    createFile src
+let init connection =
+    createFile connection
     |> Result.bind (fun file ->
         match storages.TryGetValue file with
         | true, storage -> Ok storage

@@ -4,9 +4,9 @@ module Persistence.Storages.InMemory.Read
 open Infrastructure.Domain
 open Persistence.Storages.Domain.InMemory
 
-let string key (storage: Client) =
+let string (client: Client) =
     try
-        match storage.TryGetValue(key) with
+        match client.Storage.TryGetValue(client.TableName) with
         | true, value -> Ok <| Some value
         | _ -> Ok <| None
     with ex ->

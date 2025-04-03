@@ -1,7 +1,6 @@
 [<RequireQualifiedAccess>]
 module Persistence.Storage
 
-open Infrastructure
 open Persistence.Storages
 open Persistence.Storages.Domain
 
@@ -13,13 +12,13 @@ type Provider =
 
 type Connection =
     | FileSystem of FileSystem.Connection
-    | InMemory
+    | InMemory of InMemory.Connection
     | Database of Database.Connection
     | Configuration of Configuration.Connection
 
 let init connection =
     match connection with
-    | Connection.InMemory -> InMemory.Client.init () |> Result.map Provider.InMemory
-    | Connection.FileSystem value -> value |> FileSystem.Client.init |> Result.map Provider.FileSystem
-    | Connection.Database value -> value |> Database.Client.init |> Result.map Provider.Database
-    | Connection.Configuration value -> value |> Configuration.Client.init |> Result.map Provider.Configuration
+    | Connection.InMemory c -> c |> InMemory.Client.init |> Result.map Provider.InMemory
+    | Connection.FileSystem c -> c |> FileSystem.Client.init |> Result.map Provider.FileSystem
+    | Connection.Database c -> c |> Database.Client.init |> Result.map Provider.Database
+    | Connection.Configuration c -> c |> Configuration.Client.init |> Result.map Provider.Configuration

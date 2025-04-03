@@ -2,4 +2,8 @@
 
 open System.Collections.Concurrent
 
-type Client = ConcurrentDictionary<string, string>
+type Client = {
+    TableName: string
+    Storage: ConcurrentDictionary<string, string>
+}
+type Connection = { TableName: string }

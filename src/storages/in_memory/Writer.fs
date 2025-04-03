@@ -4,9 +4,9 @@ module Persistence.Storages.InMemory.Write
 open Infrastructure.Domain
 open Persistence.Storages.Domain.InMemory
 
-let string key value (storage: Client) =
+let string value (client: Client) =
     try
-        storage.AddOrUpdate(key, value, (fun _ _ -> value)) |> ignore |> Ok
+        client.Storage.AddOrUpdate(client.TableName, value, (fun _ _ -> value)) |> ignore |> Ok
     with ex ->
         Error
         <| Operation {

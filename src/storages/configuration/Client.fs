@@ -5,7 +5,7 @@ open Persistence.Storages.Domain.Configuration
 
 let init (connection: Connection) =
     {
-        Configuration = connection.Provider
-        Key = connection.SectionName
+        ReadOnlyStorage = connection.Provider
+        Section = connection.Section
     }
     |> Ok

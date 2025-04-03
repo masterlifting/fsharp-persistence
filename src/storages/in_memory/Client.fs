@@ -4,12 +4,18 @@ module Persistence.Storages.InMemory.Client
 open System
 open Infrastructure.Domain
 open Persistence.Storages.Domain.InMemory
+open System.Collections.Concurrent
 
-let internal Storage = Client(StringComparer.OrdinalIgnoreCase)
+let internal Storage =
+    ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 
-let init () =
+let init connection =
     try
-        Ok <| Storage
+        Ok
+        <| {
+               TableName = connection.TableName
+               Storage = Storage
+           }
     with ex ->
         Error
         <| Operation {
