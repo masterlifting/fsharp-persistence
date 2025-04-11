@@ -61,7 +61,7 @@ let internal createLock (stream: Client) =
                 return
                     Error
                     <| Operation {
-                        Message = $"Failed to acquire lock after {attempts} attempts."
+                        Message = "Failed to create lock in file system. No more attempts."
                         Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                     }
             else
@@ -88,7 +88,7 @@ let internal releaseLock (stream: Client) =
                 return
                     Error
                     <| Operation {
-                        Message = $"Failed to release lock after {attempts} attempts."
+                        Message = "Failed to release lock in file system. No more attempts."
                         Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                     }
             else
