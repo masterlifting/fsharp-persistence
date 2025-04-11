@@ -1,5 +1,5 @@
 [<RequireQualifiedAccess>]
-module Persistence.Storages.Configuration.Client
+module Persistence.Storages.Configuration.Provider
 
 open Persistence.Storages.Domain.Configuration
 

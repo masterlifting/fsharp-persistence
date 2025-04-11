@@ -7,21 +7,21 @@
   <ItemGroup>
     <Compile Include="domain\Query.fs" />
     <Compile Include="storages\file_system\Domain.fs" />
-    <Compile Include="storages\file_system\Client.fs" />
+    <Compile Include="storages\file_system\Provider.fs" />
     <Compile Include="storages\file_system\Reader.fs" />
     <Compile Include="storages\file_system\Writer.fs" />
     <Compile Include="storages\file_system\Query.fs" />
     <Compile Include="storages\file_system\Command.fs" />
     <Compile Include="storages\in_memory\Domain.fs" />
-    <Compile Include="storages\in_memory\Client.fs" />
+    <Compile Include="storages\in_memory\Provider.fs" />
     <Compile Include="storages\in_memory\Reader.fs" />
     <Compile Include="storages\in_memory\Writer.fs" />
     <Compile Include="storages\in_memory\Query.fs" />
     <Compile Include="storages\in_memory\Command.fs" />
     <Compile Include="storages\database\Domain.fs" />
-    <Compile Include="storages\database\Client.fs" />
+    <Compile Include="storages\database\Provider.fs" />
     <Compile Include="storages\configuration\Domain.fs" />
-    <Compile Include="storages\configuration\Client.fs" />
+    <Compile Include="storages\configuration\Provider.fs" />
     <Compile Include="storages\configuration\Reader.fs" />
     <Compile Include="data_access\Error.fs" />
     <Compile Include="Storage.fs" />

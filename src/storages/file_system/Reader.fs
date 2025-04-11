@@ -9,20 +9,20 @@ open Persistence.Storages.Domain.FileSystem
 
 let private read (stream: Client) =
     async {
-        do! Client.Semaphore.WaitAsync() |> Async.AwaitTask
+        do! Provider.Semaphore.WaitAsync() |> Async.AwaitTask
 
         stream.Position <- 0
         let data = Array.zeroCreate<byte> (int stream.Length)
         let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
 
-        Client.Semaphore.Release() |> ignore
+        Provider.Semaphore.Release() |> ignore
 
         return data
     }
 
 let bytes (stream: Client) =
     stream
-    |> Client.createLock
+    |> Provider.createLock
     |> ResultAsync.bindAsync (fun _ ->
         async {
             try
@@ -40,11 +40,11 @@ let bytes (stream: Client) =
                         Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                     }
         })
-    |> Async.bind (fun result -> stream |> Client.releaseLock |> ResultAsync.bind (fun _ -> result))
+    |> Async.bind (fun result -> stream |> Provider.releaseLock |> ResultAsync.bind (fun _ -> result))
 
 let string (stream: Client) =
     stream
-    |> Client.createLock
+    |> Provider.createLock
     |> ResultAsync.bindAsync (fun _ ->
         async {
             try
@@ -62,4 +62,4 @@ let string (stream: Client) =
                         Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                     }
         })
-    |> Async.bind (fun result -> stream |> Client.releaseLock |> ResultAsync.bind (fun _ -> result))
+    |> Async.bind (fun result -> stream |> Provider.releaseLock |> ResultAsync.bind (fun _ -> result))

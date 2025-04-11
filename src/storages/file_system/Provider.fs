@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.Storages.FileSystem.Client
+module Persistence.Storages.FileSystem.Provider
 
 open System.IO
 open Infrastructure.Domain

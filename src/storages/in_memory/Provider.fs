@@ -1,10 +1,10 @@
 ﻿[<RequireQualifiedAccess>]
-module Persistence.Storages.InMemory.Client
+module Persistence.Storages.InMemory.Provider
 
 open System
+open System.Collections.Concurrent
 open Infrastructure.Domain
 open Persistence.Storages.Domain.InMemory
-open System.Collections.Concurrent
 
 let internal Storage =
     ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase)
