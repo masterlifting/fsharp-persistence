@@ -9,13 +9,13 @@ open Persistence.Storages.Domain.FileSystem
 
 let private read (stream: Client) =
     async {
-        do! Provider.Semaphore.WaitAsync() |> Async.AwaitTask
+        do! Semaphore.WaitAsync() |> Async.AwaitTask
 
         stream.Position <- 0
         let data = Array.zeroCreate<byte> (int stream.Length)
         let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
 
-        Provider.Semaphore.Release() |> ignore
+        Semaphore.Release() |> ignore
 
         return data
     }

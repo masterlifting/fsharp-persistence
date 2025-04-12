@@ -9,7 +9,7 @@ open Persistence.Storages.Domain.FileSystem
 
 let private write (data: byte array) (stream: Client) =
     async {
-        do! Provider.Semaphore.WaitAsync() |> Async.AwaitTask
+        do! Semaphore.WaitAsync() |> Async.AwaitTask
 
         stream.Position <- 0
         stream.SetLength 0
@@ -17,7 +17,7 @@ let private write (data: byte array) (stream: Client) =
         do! stream.WriteAsync(data, 0, data.Length) |> Async.AwaitTask
         do! stream.FlushAsync() |> Async.AwaitTask
 
-        Provider.Semaphore.Release() |> ignore
+        Semaphore.Release() |> ignore
     }
 
 let bytes (stream: Client) data =

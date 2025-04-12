@@ -45,14 +45,9 @@ let init connection =
                 Ok storage
             | Error ex -> Error ex)
 
-[<Literal>]
-let private lockExt = ".lock"
-
-let internal Semaphore = new System.Threading.SemaphoreSlim(1, 1)
-
 let internal createLock (stream: Client) =
 
-    let lockFile = stream.Name + lockExt
+    let lockFile = stream.Name + LOCK_EXT
 
     let rec innerLoop attempts (delay: int) =
         async {
@@ -79,7 +74,7 @@ let internal createLock (stream: Client) =
     innerLoop 10 100
 
 let internal releaseLock (stream: Client) =
-    let lockFile = stream.Name + lockExt
+    let lockFile = stream.Name + LOCK_EXT
 
     let rec innerLoop attempts (delay: int) =
         async {
