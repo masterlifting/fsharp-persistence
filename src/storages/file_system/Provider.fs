@@ -6,6 +6,7 @@ open Infrastructure.Domain
 open Infrastructure.Prelude
 open Persistence.Storages.Domain.FileSystem
 
+//TODO: Refactor this locking mechanism to use a more robust solution
 let private storages = ClientFactory()
 
 let private createFile connection =
