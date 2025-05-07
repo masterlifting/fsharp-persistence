@@ -1,8 +1,8 @@
 ﻿[<RequireQualifiedAccess>]
 module Persistence.Storages.FileSystem.Query
 
-open Infrastructure
 open Infrastructure.Prelude
+open Infrastructure.SerDe
 open Persistence.Domain
 
 let paginate<'a> (pagination: Query.Pagination<'a>) (data: 'a list) =

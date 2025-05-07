@@ -1,7 +1,7 @@
 ﻿[<RequireQualifiedAccess>]
 module Persistence.Storages.InMemory.Command
 
-open Infrastructure
+open Infrastructure.SerDe
 
 module Json =
     let save<'a> (data: 'a array) client =
