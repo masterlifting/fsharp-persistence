@@ -6,7 +6,7 @@ open System.Collections.Concurrent
 open Infrastructure.Domain
 open Persistence.Storages.Domain.InMemory
 
-let internal Storage =
+let private storage =
     ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 
 let init connection =
@@ -14,7 +14,7 @@ let init connection =
         Ok
         <| {
                TableName = connection.TableName
-               Storage = Storage
+               Storage = storage
            }
     with ex ->
         Error

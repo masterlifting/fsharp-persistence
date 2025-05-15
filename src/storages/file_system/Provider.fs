@@ -7,9 +7,9 @@ open Infrastructure.Prelude
 open Persistence.Storages.Domain.FileSystem
 
 //TODO: Refactor this locking mechanism to use a more robust solution
-let private storages = ClientFactory()
+let private clients = ClientFactory()
 
-let private createFile connection =
+let private createFilePath connection =
     try
         Path.Combine(connection.FilePath, connection.FileName) |> Ok
     with ex ->
@@ -35,16 +35,15 @@ let private createClient file =
         }
 
 let init connection =
-    createFile connection
-    |> Result.bind (fun file ->
-        match storages.TryGetValue file with
+    createFilePath connection
+    |> Result.bind (fun filePath ->
+        match clients.TryGetValue filePath with
         | true, storage -> Ok storage
         | false, _ ->
-            match createClient file with
-            | Ok storage ->
-                storages.TryAdd(file, storage) |> ignore
-                Ok storage
-            | Error ex -> Error ex)
+            createClient filePath
+            |> Result.map (fun client ->
+                clients.TryAdd(filePath, client) |> ignore
+                client))
 
 let internal createLock (stream: Client) =
 
