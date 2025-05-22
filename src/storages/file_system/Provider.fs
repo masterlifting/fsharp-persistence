@@ -61,16 +61,19 @@ let internal acquireLock (stream: Client) =
         let rec tryCreateLockFile attempts (delay: int) =
             async {
                 try
-                    use lockFile = new FileStream(lockFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None)
-                    lockFile.Close()
+                    use _ =
+                        new FileStream(lockFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None)
                     return Ok()
                 with ex ->
                     if attempts <= 0 then
                         appLock.Release() |> ignore
-                        return Error <| Operation {
-                            Message = $"FileSystem.Provider. Failed to acquire file lock after multiple attempts: {ex |> Exception.toMessage}"
-                            Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
-                        }
+                        return
+                            Error
+                            <| Operation {
+                                Message =
+                                    $"FileSystem.Provider. Failed to acquire file lock after multiple attempts: {ex |> Exception.toMessage}"
+                                Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                            }
                     else
                         do! Async.Sleep delay
                         return! tryCreateLockFile (attempts - 1) (delay * 2)
@@ -90,8 +93,10 @@ let internal releaseLock (stream: Client) =
             return Ok()
         with ex ->
             appLock.Release() |> ignore
-            return Error <| Operation {
-                Message = $"FileSystem.Provider. Failed to release locks: {ex |> Exception.toMessage}"
-                Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
-            }
+            return
+                Error
+                <| Operation {
+                    Message = $"FileSystem.Provider. Failed to release locks: {ex |> Exception.toMessage}"
+                    Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                }
     }

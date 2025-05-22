@@ -26,7 +26,7 @@ let private write (data: byte array) (stream: Client) =
                         Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                     }
         })
-    |> Async.apply (stream |> Provider.releaseLock )
+    |> Async.apply (stream |> Provider.releaseLock)
 
 let bytes (stream: Client) data = stream |> write data
 
