@@ -5,9 +5,11 @@ open System.IO
 open Infrastructure.Domain
 open Infrastructure.Prelude
 open Persistence.Storages.Domain.FileSystem
+open System.Collections.Concurrent
+open System.Threading
 
-//TODO: Refactor this locking mechanism to use a more robust solution
 let private clients = ClientFactory()
+let private appLocks = ConcurrentDictionary<string, SemaphoreSlim>()
 
 let private createFilePath connection =
     try
@@ -34,6 +36,11 @@ let private createClient file =
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
 
+let private getAppLock (filePath: string) =
+    appLocks.GetOrAdd(filePath, fun _ -> new SemaphoreSlim(1, 1))
+
+let private getLockFilePath (filePath: string) = filePath + ".lock"
+
 let init connection =
     createFilePath connection
     |> Result.bind (fun filePath ->
@@ -45,57 +52,46 @@ let init connection =
                 clients.TryAdd(filePath, client) |> ignore
                 client))
 
-let internal createLock (stream: Client) =
-
-    let lockFile = stream.Name + LOCK_EXT
-
-    let rec innerLoop attempts (delay: int) =
-        async {
-
-            if attempts <= 0 then
-                return
-                    Error
-                    <| Operation {
-                        Message = "Failed to create lock in file system. No more attempts."
-                        Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
-                    }
-            else
+let internal acquireLock (stream: Client) =
+    async {
+        let filePath = stream.Name
+        let appLock = getAppLock filePath
+        do! appLock.WaitAsync() |> Async.AwaitTask
+        let lockFilePath = getLockFilePath filePath
+        let rec tryCreateLockFile attempts (delay: int) =
+            async {
                 try
-                    if lockFile |> File.Exists then
-                        do! Async.Sleep delay
-                        return! innerLoop (attempts - 1) (delay * 2)
+                    use lockFile = new FileStream(lockFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None)
+                    lockFile.Close()
+                    return Ok()
+                with ex ->
+                    if attempts <= 0 then
+                        appLock.Release() |> ignore
+                        return Error <| Operation {
+                            Message = $"FileSystem.Provider. Failed to acquire file lock after multiple attempts: {ex |> Exception.toMessage}"
+                            Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                        }
                     else
-                        return File.Create(lockFile).Dispose() |> Ok
-                with _ ->
-                    do! Async.Sleep delay
-                    return! innerLoop (attempts - 1) (delay * 2)
-        }
-
-    innerLoop 10 100
+                        do! Async.Sleep delay
+                        return! tryCreateLockFile (attempts - 1) (delay * 2)
+            }
+        return! tryCreateLockFile 5 100
+    }
 
 let internal releaseLock (stream: Client) =
-    let lockFile = stream.Name + LOCK_EXT
-
-    let rec innerLoop attempts (delay: int) =
-        async {
-
-            if attempts <= 0 then
-                return
-                    Error
-                    <| Operation {
-                        Message = "Failed to release lock in file system. No more attempts."
-                        Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
-                    }
-            else
-                try
-                    if lockFile |> File.Exists then
-                        stream.Flush()
-                        return File.Delete(lockFile) |> Ok
-                    else
-                        return Ok()
-                with _ ->
-                    do! Async.Sleep delay
-                    return! innerLoop (attempts - 1) (delay * 2)
-        }
-
-    innerLoop 10 100
+    async {
+        let filePath = stream.Name
+        let appLock = getAppLock filePath
+        let lockFilePath = getLockFilePath filePath
+        try
+            if File.Exists(lockFilePath) then
+                File.Delete(lockFilePath)
+            appLock.Release() |> ignore
+            return Ok()
+        with ex ->
+            appLock.Release() |> ignore
+            return Error <| Operation {
+                Message = $"FileSystem.Provider. Failed to release locks: {ex |> Exception.toMessage}"
+                Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+            }
+    }
