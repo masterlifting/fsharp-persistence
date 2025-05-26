@@ -58,27 +58,30 @@ let internal acquireLock (stream: Client) =
         let appLock = getAppLock filePath
         do! appLock.WaitAsync() |> Async.AwaitTask
         let lockFilePath = getLockFilePath filePath
-        let rec tryCreateLockFile attempts (delay: int) =
-            async {
-                try
-                    use _ =
-                        new FileStream(lockFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None)
-                    return Ok()
-                with ex ->
-                    if attempts <= 0 then
-                        appLock.Release() |> ignore
-                        return
-                            Error
-                            <| Operation {
-                                Message =
-                                    $"FileSystem.Provider. Failed to acquire file lock after multiple attempts: {ex |> Exception.toMessage}"
-                                Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
-                            }
-                    else
-                        do! Async.Sleep delay
-                        return! tryCreateLockFile (attempts - 1) (delay * 2)
+
+        let createLockFile () =
+            try
+                use _ =
+                    new FileStream(lockFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None)
+                Ok()
+            with ex ->
+
+                appLock.Release() |> ignore
+
+                Error
+                <| Operation {
+                    Message =
+                        $"FileSystem.Provider. Failed to acquire file lock after multiple attempts: {ex |> Exception.toMessage}"
+                    Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
+                }
+            |> async.Return
+
+        return!
+            Async.retry {
+                Delay = 100
+                Attempts = 5u<attempts>
+                Perform = createLockFile
             }
-        return! tryCreateLockFile 5 100
     }
 
 let internal releaseLock (stream: Client) =
@@ -87,8 +90,8 @@ let internal releaseLock (stream: Client) =
         let appLock = getAppLock filePath
         let lockFilePath = getLockFilePath filePath
         try
-            if File.Exists(lockFilePath) then
-                File.Delete(lockFilePath)
+            if File.Exists lockFilePath then
+                File.Delete lockFilePath
             appLock.Release() |> ignore
             return Ok()
         with ex ->
