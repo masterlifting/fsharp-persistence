@@ -18,7 +18,7 @@ type Connection =
 
 let init connection =
     match connection with
-    | Connection.InMemory c -> c |> InMemory.Provider.init |> Result.map Provider.InMemory
-    | Connection.FileSystem c -> c |> FileSystem.Provider.init |> Result.map Provider.FileSystem
-    | Connection.Database c -> c |> Database.Provider.init |> Result.map Provider.Database
-    | Connection.Configuration c -> c |> Configuration.Provider.init |> Result.map Provider.Configuration
+    | InMemory c -> c |> InMemory.Provider.init |> Result.map Provider.InMemory
+    | FileSystem c -> c |> FileSystem.Provider.init |> Result.map Provider.FileSystem
+    | Database c -> c |> Database.Provider.init |> Result.map Provider.Database
+    | Configuration c -> c |> Configuration.Provider.init |> Result.map Provider.Configuration
