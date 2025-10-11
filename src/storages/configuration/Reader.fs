@@ -7,6 +7,6 @@ open Persistence.Storages.Domain.Configuration
 
 let section<'a> (client: Client) =
     client.ReadOnlyStorage
-    |> Configuration.Client.tryGetSection<'a> client.Section
+    |> Configuration.Client.getSection<'a> client.Section
     |> Option.map Ok
     |> Option.defaultValue ($"The section '%s{client.Section}' in a configuration" |> NotFound |> Error)
