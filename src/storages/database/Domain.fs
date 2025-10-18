@@ -1,14 +1,9 @@
 ﻿module Persistence.Storages.Domain.Database
 
 type DatabaseType =
-    | SqlServer
-    | Postgres
-    | MongoDb
-    | AzureTable
+    | Postgres of connectionString: string
+    | MongoDb of connectionString: string
 
 type Client = { f: string -> string }
 
-type Connection = {
-    ConnectionString: string
-    Type: DatabaseType
-}
+type Connection = { Database: DatabaseType }

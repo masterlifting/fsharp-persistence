@@ -7,7 +7,7 @@ open Infrastructure.Domain
 open Persistence.Storages.Domain.InMemory
 
 let private storage =
-    ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    ConcurrentDictionary<string, string> StringComparer.OrdinalIgnoreCase
 
 let init connection =
     try

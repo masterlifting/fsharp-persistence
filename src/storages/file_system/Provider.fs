@@ -8,7 +8,7 @@ open Persistence.Storages.Domain.FileSystem
 open System.Collections.Concurrent
 open System.Threading
 
-let private clients = ClientFactory()
+let private clients = ConcurrentDictionary<string, Client>()
 let private appLocks = ConcurrentDictionary<string, SemaphoreSlim>()
 
 let private createFilePath connection =
@@ -44,13 +44,16 @@ let private getLockFilePath (filePath: string) = filePath + ".lock"
 let init connection =
     createFilePath connection
     |> Result.bind (fun filePath ->
-        match clients.TryGetValue filePath with
-        | true, storage -> Ok storage
-        | false, _ ->
-            createClient filePath
-            |> Result.map (fun client ->
-                clients.TryAdd(filePath, client) |> ignore
-                client))
+        match connection.Type with
+        | Transient -> createClient filePath
+        | Singleton ->
+            match clients.TryGetValue filePath with
+            | true, storage -> Ok storage
+            | false, _ ->
+                createClient filePath
+                |> Result.map (fun client ->
+                    clients.TryAdd(filePath, client) |> ignore
+                    client))
 
 let internal acquireLock (stream: Client) =
     async {
