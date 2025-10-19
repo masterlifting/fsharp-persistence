@@ -23,12 +23,18 @@ let private createFilePath connection =
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
 
-let private createClient file =
+let private createClient file type' =
     try
-        let client =
-            new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+        match type' with
+        | Transient ->
+            use client =
+                new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+            Ok client
+        | Singleton ->
+            let client =
+                new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None)
+            Ok client
 
-        Ok client
     with ex ->
         Error
         <| Operation {
@@ -45,12 +51,12 @@ let init connection =
     createFilePath connection
     |> Result.bind (fun filePath ->
         match connection.Type with
-        | Transient -> createClient filePath
+        | Transient -> createClient filePath Transient
         | Singleton ->
             match clients.TryGetValue filePath with
             | true, storage -> Ok storage
             | false, _ ->
-                createClient filePath
+                createClient filePath Singleton
                 |> Result.map (fun client ->
                     clients.TryAdd(filePath, client) |> ignore
                     client))
