@@ -1,10 +1,17 @@
 ﻿module Persistence.Storages.Domain.Database
 
+open Persistence.Storages.Domain
+
 type DatabaseType =
-    | Postgres of connectionString: string
+    | Postgre of connectionString: string
     | MongoDb of connectionString: string
     | Redis of connectionString: string
 
-type Client = unit
+type ConnectionType =
+    | Transient
+    | Singleton
 
-type Connection = { Database: DatabaseType }
+type Client =
+    | Postgre of Postgre.Client
+
+type Connection = { Database: DatabaseType; Type: ConnectionType }
