@@ -24,17 +24,17 @@
     <Compile Include="storages\configuration\Reader.fs" />
     <Compile Include="storages\database\postgre\Domain.fs" />
     <Compile Include="storages\database\postgre\Provider.fs" />
-    <Compile Include="storages\database\postgre\Reader.fs" />
-    <Compile Include="storages\database\postgre\Writer.fs" />
+    <Compile Include="storages\database\postgre\Query.fs" />
+    <Compile Include="storages\database\postgre\Command.fs" />
     <Compile Include="storages\database\Domain.fs" />
     <Compile Include="storages\database\Provider.fs" />
     <Compile Include="data_access\Error.fs" />
     <Compile Include="Storage.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="9.0.2" />
-    <PackageReference Include="Dapper" Version="2.1.37" />
-    <PackageReference Include="Dapper.FSharp" Version="4.8.0" />
+    <PackageReference Include="Npgsql" Version="9.0.4" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Dapper.FSharp" Version="4.9.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\fsharp-infrastructure\src\fsharp-infrastructure.fsproj" />

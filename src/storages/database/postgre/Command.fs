@@ -1,16 +1,15 @@
 [<RequireQualifiedAccess>]
-module Persistence.Storages.Postgre.Write
+module Persistence.Storages.Postgre.Command
 
 open Dapper
 open Infrastructure.Domain
 open Infrastructure.Prelude
 open Persistence.Storages.Domain.Postgre
 
-let execute (request: Command.Request) (client: Client) =
+let execute (request: Request) (client: Client) =
     async {
         try
             let! rowsAffected = client.ExecuteAsync(request.Sql, request.Params) |> Async.AwaitTask
-
             return Ok rowsAffected
         with ex ->
             return
