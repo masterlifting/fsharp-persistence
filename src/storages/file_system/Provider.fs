@@ -4,6 +4,7 @@ module Persistence.Storages.FileSystem.Provider
 open System.IO
 open Infrastructure.Domain
 open Infrastructure.Prelude
+open Persistence.Domain
 open Persistence.Storages.Domain.FileSystem
 open System.Collections.Concurrent
 open System.Threading
@@ -50,7 +51,7 @@ let private getLockFilePath (filePath: string) = filePath + ".lock"
 let init connection =
     createFilePath connection
     |> Result.bind (fun filePath ->
-        match connection.Type with
+        match connection.Lifetime with
         | Transient -> createClient filePath Transient
         | Singleton ->
             match clients.TryGetValue filePath with

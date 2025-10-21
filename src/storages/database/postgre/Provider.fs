@@ -4,6 +4,7 @@ module Persistence.Storages.Postgre.Provider
 open Npgsql
 open Infrastructure.Domain
 open Infrastructure.Prelude
+open Persistence.Domain
 open Persistence.Storages.Domain.Postgre
 open System.Collections.Concurrent
 open System.Data
@@ -12,10 +13,10 @@ let private clients = ConcurrentDictionary<string, Client>()
 
 let init connection =
     try
-        match connection.Type with
+        match connection.Lifetime with
         | Singleton ->
             match clients.TryGetValue connection.String with
-            | true, client -> 
+            | true, client ->
                 match client.State with
                 | ConnectionState.Open -> Ok client
                 | _ ->

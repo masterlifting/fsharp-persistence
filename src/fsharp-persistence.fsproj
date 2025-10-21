@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="domain\Query.fs" />
+    <Compile Include="Domain.fs" />
     <Compile Include="storages\Query.fs" />
     <Compile Include="storages\file_system\Domain.fs" />
     <Compile Include="storages\file_system\Provider.fs" />
@@ -26,8 +26,6 @@
     <Compile Include="storages\database\postgre\Provider.fs" />
     <Compile Include="storages\database\postgre\Reader.fs" />
     <Compile Include="storages\database\postgre\Writer.fs" />
-    <Compile Include="storages\database\postgre\Command.fs" />
-    <Compile Include="storages\database\postgre\Query.fs" />
     <Compile Include="storages\database\Domain.fs" />
     <Compile Include="storages\database\Provider.fs" />
     <Compile Include="data_access\Error.fs" />
