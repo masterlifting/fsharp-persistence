@@ -9,3 +9,8 @@ let init (connection: Connection) =
         Section = connection.Section
     }
     |> Ok
+
+let dispose _ =
+    // Configuration provider is typically managed by DI container
+    // IConfigurationRoot disposal is handled by the container lifecycle
+    ()

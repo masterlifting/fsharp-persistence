@@ -24,17 +24,25 @@ let init connection =
                     client.Open()
                     Ok client
             | false, _ ->
-                let conn = new NpgsqlConnection(connection.String)
-                conn.Open()
-                clients.TryAdd(connection.String, conn) |> ignore
-                Ok conn
+                let client = new NpgsqlConnection(connection.String)
+                client.Open()
+                clients.TryAdd(connection.String, client) |> ignore
+                Ok client
         | Transient ->
-            use conn = new NpgsqlConnection(connection.String)
-            conn.Open()
-            Ok conn
+            let client = new NpgsqlConnection(connection.String)
+            client.Open()
+            Ok client
     with ex ->
         Error
         <| Operation {
             Message = $"Failed to initialize PostgreSQL connection: {ex |> Exception.toMessage}"
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
+
+let dispose (client: Client) =
+    try
+        client.Close()
+        client.Dispose()
+        clients.TryRemove client.ConnectionString |> ignore
+    with _ ->
+        ()

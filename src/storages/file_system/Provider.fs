@@ -28,7 +28,7 @@ let private createClient file type' =
     try
         match type' with
         | Transient ->
-            use client =
+            let client =
                 new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
             Ok client
         | Singleton ->
@@ -55,7 +55,12 @@ let init connection =
         | Transient -> createClient filePath Transient
         | Singleton ->
             match clients.TryGetValue filePath with
-            | true, storage -> Ok storage
+            | true, client ->
+                match client.CanRead && client.CanWrite with
+                | true -> Ok client
+                | false ->
+                    client.Close()
+                    createClient filePath Singleton
             | false, _ ->
                 createClient filePath Singleton
                 |> Result.map (fun client ->
@@ -113,3 +118,10 @@ let internal releaseLock (stream: Client) =
                     Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                 }
     }
+
+let dispose (client: Client) =
+    try
+        client.Close()
+        client.Dispose()
+    with _ ->
+        ()

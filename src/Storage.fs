@@ -22,3 +22,10 @@ let init connection =
     | FileSystem c -> c |> FileSystem.Provider.init |> Result.map Provider.FileSystem
     | Database c -> c |> Database.Provider.init |> Result.map Provider.Database
     | Configuration c -> c |> Configuration.Provider.init |> Result.map Provider.Configuration
+
+let dispose provider =
+    match provider with
+    | Provider.InMemory client -> client |> InMemory.Provider.dispose
+    | Provider.FileSystem client -> client |> FileSystem.Provider.dispose
+    | Provider.Configuration client -> client |> Configuration.Provider.dispose
+    | Provider.Database client -> client |> Database.Provider.dispose

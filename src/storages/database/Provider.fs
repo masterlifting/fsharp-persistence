@@ -16,3 +16,7 @@ let init (connection: Database.Connection) =
         |> Result.map Database.Client.Postgre
     | Database.MongoDb _ -> "MongoDb client" |> NotSupported |> Error
     | Database.Redis _ -> "Redis client" |> NotSupported |> Error
+
+let dispose (client: Database.Client) =
+    match client with
+    | Database.Client.Postgre client -> client |> Postgre.Provider.dispose

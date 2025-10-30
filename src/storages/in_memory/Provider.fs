@@ -22,3 +22,8 @@ let init connection =
             Message = ex.Message
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
+
+let dispose _ =
+    // InMemory storage uses ConcurrentDictionary which doesn't need disposal
+    // The storage persists for the application lifetime
+    ()
