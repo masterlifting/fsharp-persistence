@@ -43,6 +43,5 @@ let dispose (client: Client) =
     try
         client.Close()
         client.Dispose()
-        clients.TryRemove client.ConnectionString |> ignore
     with _ ->
         ()
