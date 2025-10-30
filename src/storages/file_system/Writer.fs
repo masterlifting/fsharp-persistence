@@ -7,16 +7,16 @@ open Infrastructure.Prelude
 open Persistence.Storages.FileSystem
 open Persistence.Storages.Domain.FileSystem
 
-let private write (data: byte array) (stream: Client) =
-    stream
+let private write (data: byte array) (client: Client) =
+    client
     |> Provider.acquireLock
     |> ResultAsync.bindAsync (fun _ ->
         async {
             try
-                stream.Position <- 0
-                stream.SetLength 0
-                do! stream.WriteAsync(data, 0, data.Length) |> Async.AwaitTask
-                do! stream.FlushAsync() |> Async.AwaitTask
+                client.Stream.Position <- 0
+                client.Stream.SetLength 0
+                do! client.Stream.WriteAsync(data, 0, data.Length) |> Async.AwaitTask
+                do! client.Stream.FlushAsync() |> Async.AwaitTask
                 return Ok()
             with ex ->
                 return
@@ -26,9 +26,9 @@ let private write (data: byte array) (stream: Client) =
                         Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                     }
         })
-    |> Async.apply (stream |> Provider.releaseLock)
+    |> Async.apply (client |> Provider.releaseLock)
 
-let bytes (stream: Client) data = stream |> write data
+let bytes (client: Client) data = client |> write data
 
-let string (stream: Client) (data: string) =
-    stream |> write (data |> Encoding.UTF8.GetBytes)
+let string (client: Client) (data: string) =
+    client |> write (data |> Encoding.UTF8.GetBytes)

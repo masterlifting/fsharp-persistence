@@ -9,29 +9,41 @@ open Persistence.Storages.Domain.Postgre
 open System.Collections.Concurrent
 open System.Data
 
-let private clients = ConcurrentDictionary<string, Client>()
+let private clients = ConcurrentDictionary<string, NpgsqlConnection>()
 
 let init connection =
     try
         match connection.Lifetime with
         | Singleton ->
             match clients.TryGetValue connection.String with
-            | true, client ->
-                match client.State with
-                | ConnectionState.Open -> Ok client
+            | true, conn ->
+                match conn.State with
+                | ConnectionState.Open ->
+                    Ok {
+                        Connection = conn
+                        Lifetime = Singleton
+                    }
                 | _ ->
-                    client.Close()
-                    client.Open()
-                    Ok client
+                    conn.Open()
+                    Ok {
+                        Connection = conn
+                        Lifetime = Singleton
+                    }
             | false, _ ->
-                let client = new NpgsqlConnection(connection.String)
-                client.Open()
-                clients.TryAdd(connection.String, client) |> ignore
-                Ok client
+                let conn = new NpgsqlConnection(connection.String)
+                conn.Open()
+                clients.TryAdd(connection.String, conn) |> ignore
+                Ok {
+                    Connection = conn
+                    Lifetime = Singleton
+                }
         | Transient ->
-            let client = new NpgsqlConnection(connection.String)
-            client.Open()
-            Ok client
+            let conn = new NpgsqlConnection(connection.String)
+            conn.Open()
+            Ok {
+                Connection = conn
+                Lifetime = Transient
+            }
     with ex ->
         Error
         <| Operation {
@@ -41,7 +53,10 @@ let init connection =
 
 let dispose (client: Client) =
     try
-        client.Close()
-        client.Dispose()
+        match client.Lifetime with
+        | Transient ->
+            client.Connection.Close()
+            client.Connection.Dispose()
+        | Singleton -> client.Connection.Close()
     with _ ->
         ()

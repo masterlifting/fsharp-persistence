@@ -7,15 +7,15 @@ open Infrastructure.Prelude
 open Persistence.Storages.FileSystem
 open Persistence.Storages.Domain.FileSystem
 
-let private read (stream: Client) =
-    stream
+let private read (client: Client) =
+    client
     |> Provider.acquireLock
     |> ResultAsync.bindAsync (fun _ ->
         async {
             try
-                stream.Position <- 0
-                let data = Array.zeroCreate<byte> (int stream.Length)
-                let! _ = stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
+                client.Stream.Position <- 0
+                let data = Array.zeroCreate<byte> (int client.Stream.Length)
+                let! _ = client.Stream.ReadAsync(data, 0, data.Length) |> Async.AwaitTask
                 return
                     match data.Length with
                     | 0 -> Ok None
@@ -28,9 +28,9 @@ let private read (stream: Client) =
                         Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                     }
         })
-    |> Async.apply (stream |> Provider.releaseLock)
+    |> Async.apply (client |> Provider.releaseLock)
 
-let bytes (stream: Client) = stream |> read
+let bytes (client: Client) = client |> read
 
-let string (stream: Client) =
-    stream |> read |> ResultAsync.map (Option.map Encoding.UTF8.GetString)
+let string (client: Client) =
+    client |> read |> ResultAsync.map (Option.map Encoding.UTF8.GetString)

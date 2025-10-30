@@ -9,7 +9,7 @@ open Persistence.Storages.Domain.FileSystem
 open System.Collections.Concurrent
 open System.Threading
 
-let private clients = ConcurrentDictionary<string, Client>()
+let private clients = ConcurrentDictionary<string, FileStream>()
 let private appLocks = ConcurrentDictionary<string, SemaphoreSlim>()
 
 let private createFilePath connection =
@@ -28,13 +28,13 @@ let private createClient file type' =
     try
         match type' with
         | Transient ->
-            let client =
-                new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
-            Ok client
+            let stream =
+                new FileStream(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+            Ok stream
         | Singleton ->
-            let client =
-                new Client(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None)
-            Ok client
+            let stream =
+                new FileStream(file, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None)
+            Ok stream
 
     with ex ->
         Error
@@ -52,24 +52,40 @@ let init connection =
     createFilePath connection
     |> Result.bind (fun filePath ->
         match connection.Lifetime with
-        | Transient -> createClient filePath Transient
+        | Transient ->
+            createClient filePath Transient
+            |> Result.map (fun stream -> {
+                Stream = stream
+                Lifetime = Transient
+            })
         | Singleton ->
             match clients.TryGetValue filePath with
-            | true, client ->
-                match client.CanRead && client.CanWrite with
-                | true -> Ok client
+            | true, stream ->
+                match stream.CanRead && stream.CanWrite with
+                | true ->
+                    Ok {
+                        Stream = stream
+                        Lifetime = Singleton
+                    }
                 | false ->
-                    client.Close()
+                    stream.Close()
                     createClient filePath Singleton
+                    |> Result.map (fun stream -> {
+                        Stream = stream
+                        Lifetime = Singleton
+                    })
             | false, _ ->
                 createClient filePath Singleton
-                |> Result.map (fun client ->
-                    clients.TryAdd(filePath, client) |> ignore
-                    client))
+                |> Result.map (fun stream ->
+                    clients.TryAdd(filePath, stream) |> ignore
+                    {
+                        Stream = stream
+                        Lifetime = Singleton
+                    }))
 
-let internal acquireLock (stream: Client) =
+let internal acquireLock (client: Client) =
     async {
-        let filePath = stream.Name
+        let filePath = client.Stream.Name
         let appLock = getAppLock filePath
         do! appLock.WaitAsync() |> Async.AwaitTask
         let lockFilePath = getLockFilePath filePath
@@ -99,9 +115,9 @@ let internal acquireLock (stream: Client) =
             }
     }
 
-let internal releaseLock (stream: Client) =
+let internal releaseLock (client: Client) =
     async {
-        let filePath = stream.Name
+        let filePath = client.Stream.Name
         let appLock = getAppLock filePath
         let lockFilePath = getLockFilePath filePath
         try
@@ -121,7 +137,10 @@ let internal releaseLock (stream: Client) =
 
 let dispose (client: Client) =
     try
-        client.Close()
-        client.Dispose()
+        match client.Lifetime with
+        | Transient ->
+            client.Stream.Close()
+            client.Stream.Dispose()
+        | Singleton -> client.Stream.Close()
     with _ ->
         ()

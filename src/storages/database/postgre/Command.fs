@@ -9,7 +9,7 @@ open Persistence.Storages.Domain.Postgre
 let execute (request: Request) (client: Client) =
     async {
         try
-            let! rowsAffected = client.ExecuteAsync(request.Sql, request.Params) |> Async.AwaitTask
+            let! rowsAffected = client.Connection.ExecuteAsync(request.Sql, request.Params) |> Async.AwaitTask
             return Ok rowsAffected
         with ex ->
             return

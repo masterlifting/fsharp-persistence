@@ -3,7 +3,10 @@
 open System
 open Persistence.Domain
 
-type Client = IO.FileStream
+type Client = {
+    Stream: IO.FileStream
+    Lifetime: Lifetime
+}
 
 type Connection = {
     FilePath: string

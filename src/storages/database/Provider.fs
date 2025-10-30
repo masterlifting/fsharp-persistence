@@ -8,10 +8,11 @@ open Persistence.Storages.Domain
 let init (connection: Database.Connection) =
     match connection.Database with
     | Database.Postgre connectionString ->
-        {
-            Postgre.String = connectionString
-            Postgre.Lifetime = connection.Lifetime
+        ({
+            String = connectionString
+            Lifetime = connection.Lifetime
         }
+        : Postgre.Connection)
         |> Postgre.Provider.init
         |> Result.map Database.Client.Postgre
     | Database.MongoDb _ -> "MongoDb client" |> NotSupported |> Error
