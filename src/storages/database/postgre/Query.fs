@@ -9,7 +9,9 @@ open Persistence.Storages.Domain.Postgre
 let get<'a> (request: Request) (client: Client) =
     async {
         try
-            let! results = client.Connection.QueryAsync<'a>(request.Sql, request.Params) |> Async.AwaitTask
+            let! results =
+                client.Connection.QueryAsync<'a>(request.Sql, request.Params |> Option.toObj)
+                |> Async.AwaitTask
             return Ok(results |> Seq.toArray)
         with ex ->
             return
