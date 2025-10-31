@@ -44,7 +44,7 @@ let private createClient file type' =
         }
 
 let private getAppLock (filePath: string) =
-    appLocks.GetOrAdd(filePath, fun _ -> new SemaphoreSlim(1, 1))
+    appLocks.GetOrAdd(filePath, (fun _ -> new SemaphoreSlim(1, 1)))
 
 let private getLockFilePath (filePath: string) = filePath + ".lock"
 
