@@ -51,12 +51,25 @@ let init connection =
             Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
         }
 
+let clone (client: Client) =
+    let connection = client.Connection.ConnectionString |> client.Connection.CloneWith
+    {
+        Connection = connection
+        Lifetime = Transient
+    }
+
 let dispose (client: Client) =
     try
         match client.Lifetime with
         | Transient ->
-            client.Connection.Close()
-            client.Connection.Dispose()
-        | Singleton -> client.Connection.Close()
+            match client.Connection.State with
+            | ConnectionState.Open ->
+                client.Connection.Close()
+                client.Connection.Dispose()
+            | _ -> ()
+        | Singleton ->
+            match client.Connection.State with
+            | ConnectionState.Open -> client.Connection.Close()
+            | _ -> ()
     with _ ->
         ()
