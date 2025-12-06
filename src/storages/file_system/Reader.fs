@@ -28,7 +28,7 @@ let private read (client: Client) =
                         Code = (__SOURCE_DIRECTORY__, __SOURCE_FILE__, __LINE__) |> Line |> Some
                     }
         })
-    |> ResultAsync.applyAsync (client |> Provider.releaseLock)
+    |> ResultAsync.applyAsync (fun _ -> client |> Provider.releaseLock)
 
 let bytes (client: Client) = client |> read
 
