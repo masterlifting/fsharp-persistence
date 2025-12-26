@@ -28,7 +28,6 @@
     <Compile Include="storages\database\postgre\Command.fs" />
     <Compile Include="storages\database\Domain.fs" />
     <Compile Include="storages\database\Provider.fs" />
-    <Compile Include="data_access\Error.fs" />
     <Compile Include="Storage.fs" />
   </ItemGroup>
   <ItemGroup>
