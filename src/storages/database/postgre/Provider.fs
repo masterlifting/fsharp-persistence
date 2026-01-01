@@ -67,9 +67,6 @@ let dispose (client: Client) =
                 client.Connection.Close()
                 client.Connection.Dispose()
             | _ -> ()
-        | Singleton ->
-            match client.Connection.State with
-            | ConnectionState.Open -> client.Connection.Close()
-            | _ -> ()
+        | Singleton -> ()
     with _ ->
         ()
