@@ -8,8 +8,29 @@ open Persistence.Domain
 open Persistence.Storages.Domain.Postgre
 open System.Collections.Concurrent
 open System.Data
+open System
 
 let private clients = ConcurrentDictionary<string, NpgsqlConnection>()
+
+type private SqlDateOnlyTypeHandler() =
+    inherit Dapper.SqlMapper.TypeHandler<DateOnly>()
+
+    override _.SetValue(parameter: IDbDataParameter, date: DateOnly) =
+        parameter.Value <- date.ToDateTime(TimeOnly(0, 0))
+
+    override _.Parse(value: obj) =
+        DateOnly.FromDateTime(value :?> DateTime)
+
+type private SqlTimeOnlyTypeHandler() =
+    inherit Dapper.SqlMapper.TypeHandler<TimeOnly>()
+
+    override _.SetValue(parameter: IDbDataParameter, time: TimeOnly) = parameter.Value <- time.ToString()
+
+    override _.Parse(value: obj) =
+        TimeOnly.FromTimeSpan(value :?> TimeSpan)
+
+Dapper.SqlMapper.AddTypeHandler(SqlDateOnlyTypeHandler())
+Dapper.SqlMapper.AddTypeHandler(SqlTimeOnlyTypeHandler())
 
 let init connection =
     try
