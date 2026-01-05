@@ -24,7 +24,7 @@ type private SqlDateOnlyTypeHandler() =
 type private SqlTimeOnlyTypeHandler() =
     inherit Dapper.SqlMapper.TypeHandler<TimeOnly>()
 
-    override _.SetValue(parameter: IDbDataParameter, time: TimeOnly) = parameter.Value <- time.ToString()
+    override _.SetValue(parameter: IDbDataParameter, time: TimeOnly) = parameter.Value <- time.ToTimeSpan()
 
     override _.Parse(value: obj) =
         TimeOnly.FromTimeSpan(value :?> TimeSpan)
